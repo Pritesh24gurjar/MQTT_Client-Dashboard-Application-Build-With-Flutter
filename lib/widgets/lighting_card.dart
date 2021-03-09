@@ -1,13 +1,19 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:mqtt_app/modules/core/managers/MQTTManager.dart';
+import 'package:provider/provider.dart';
 
 class LightingCard extends StatefulWidget {
   final String title;
   final String image;
+  final String pub;
+  final int qos;
 
   LightingCard({
     this.title,
     this.image,
+    this.pub,
+    this.qos,
   });
 
   @override
@@ -15,6 +21,7 @@ class LightingCard extends StatefulWidget {
 }
 
 class _LightingCardState extends State<LightingCard> {
+  MQTTManager _manager;
   bool _switchValue = false;
   String status = 'On';
   Color _color = Colors.white;
@@ -22,6 +29,7 @@ class _LightingCardState extends State<LightingCard> {
 
   @override
   Widget build(BuildContext context) {
+    _manager = Provider.of<MQTTManager>(context);
     double _width = MediaQuery.of(context).size.width;
     double _height = MediaQuery.of(context).size.height;
 
@@ -69,13 +77,18 @@ class _LightingCardState extends State<LightingCard> {
                     trackColor: Colors.grey[100],
                     activeColor: Colors.grey[400],
                     value: _switchValue,
-                    onChanged: (value){
+                    onChanged: (value) {
                       setState(() {
                         _switchValue = value;
                         status == 'On' ? status = 'Off' : status = 'On';
-                        status == 'On' ? _color = Colors.white : _color = Theme.of(context).backgroundColor;
-                        status == 'On' ? _colorText = Colors.black87 : _colorText = Colors.white;
+                        status == 'On'
+                            ? _color = Colors.white
+                            : _color = Theme.of(context).backgroundColor;
+                        status == 'On'
+                            ? _colorText = Colors.black87
+                            : _colorText = Colors.white;
                       });
+                      _manager.publish(status, widget.qos, widget.pub, false);
                     },
                   ),
                 ],
@@ -90,7 +103,6 @@ class _LightingCardState extends State<LightingCard> {
               ),
             ),
           ],
-
         ),
       ),
     );

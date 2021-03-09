@@ -1,18 +1,18 @@
 class Roomdevices {
   final int id;
-  final int roomId;
+  final int roomid;
   final String title;
-  final String message;
-  final String sub;
-  Roomdevices({this.id, this.roomId, this.title, this.message, this.sub});
+  final int qos;
+  final String pub;
+  Roomdevices({this.id, this.roomid, this.title, this.pub, this.qos});
 
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'roomId': roomId,
+      'roomid': roomid,
       'title': title,
-      'message': message,
-      'sub': sub,
+      'pub': pub,
+      'qos': qos,
     };
   }
 }

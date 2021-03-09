@@ -1,5 +1,6 @@
 import 'package:mqtt_app/models/devices.dart';
 import 'package:mqtt_app/models/room.dart';
+import 'package:mqtt_app/models/roomdevices.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -9,7 +10,7 @@ import 'package:mqtt_app/models/task.dart';
 class DatabaseHelper {
   Future<Database> database() async {
     return openDatabase(
-      join(await getDatabasesPath(), 'xyz2.db'),
+      join(await getDatabasesPath(), 'xyz3.db'),
       onCreate: (db, version) async {
         await db.execute(
             "CREATE TABLE broker(id INTEGER PRIMARY KEY, title TEXT, description TEXT, clientid TEXT,username TEXT,password TEXT)");
@@ -19,6 +20,8 @@ class DatabaseHelper {
             "CREATE TABLE devices(id INTEGER PRIMARY KEY , title TEXT, sub TEXT , qos TEXT , retain TEXT )");
         await db.execute(
             "CREATE TABLE rooms(id INTEGER PRIMARY KEY , title TEXT, sub TEXT )");
+        await db.execute(
+            "CREATE TABLE roomdiv(id INTEGER PRIMARY KEY, roomid INTEGER, title TEXT, pub TEXT , qos INTEGER)");
         return db;
       },
       version: 1,
@@ -163,6 +166,12 @@ class DatabaseHelper {
           sub: deviceMap[index]['sub']);
     });
   }
+
+  Future<void> delete_device(int id) async {
+    Database _db = await database();
+    await _db.rawDelete("DELETE FROM devices WHERE id = '$id'");
+  }
+
 ///////////////////////////// rooms //////////////////////
 
   Future<int> insertrooms(Room rooms) async {
@@ -198,5 +207,54 @@ class DatabaseHelper {
           title: roomMap[index]['title'],
           sub: roomMap[index]['sub']);
     });
+  }
+
+  Future<void> delete_room(int id) async {
+    Database _db = await database();
+    await _db.rawDelete("DELETE FROM rooms WHERE id = '$id'");
+    await _db.rawDelete("DELETE FROM roomdiv WHERE roomid = '$id'");
+  }
+
+  ///////////////////  Room devices ///////////////////
+  Future<int> insertRoomdiv(Roomdevices roomdevices) async {
+    int roomDivId = 0;
+    Database _db = await database();
+    await _db
+        .insert('roomdiv', roomdevices.toMap(),
+            conflictAlgorithm: ConflictAlgorithm.replace)
+        .then((value) {
+      roomDivId = value;
+    });
+    print('-------------\n\n\n\n rrom device \n\n\n\n----------------------');
+    return roomDivId;
+  }
+
+  Future<List<Roomdevices>> getRoomdiv(int roomid) async {
+    Database _db = await database();
+    List<Map<String, dynamic>> roomMap =
+        await _db.rawQuery("SELECT * FROM roomdiv WHERE roomid = $roomid");
+    return List.generate(roomMap.length, (index) {
+      return Roomdevices(
+          id: roomMap[index]['id'],
+          title: roomMap[index]['title'],
+          roomid: roomMap[index]['roomid'],
+          qos: roomMap[index]['qos'],
+          pub: roomMap[index]['pub']);
+    });
+  }
+
+  Future<void> updateRoomdivPub(int id, String pub) async {
+    Database _db = await database();
+    await _db.rawUpdate("UPDATE roomdiv SET pub = '$pub' WHERE id = '$id'");
+  }
+
+  Future<void> updateRoomdivQos(int id, int qos) async {
+    Database _db = await database();
+    await _db.rawUpdate("UPDATE roomdiv SET qos = '$qos' WHERE id = '$id'");
+  }
+
+  Future<void> delete_room_div(int id) async {
+    Database _db = await database();
+    await _db.rawDelete("DELETE FROM roomdiv WHERE id = '$id'");
   }
 }

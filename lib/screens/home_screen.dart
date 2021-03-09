@@ -70,7 +70,7 @@ class HomeScreen extends StatelessWidget {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => DetailScreen(
-                                              title: _listRooms[index].name,
+                                              room: _listRooms[index],
                                             )));
                               },
                             ),

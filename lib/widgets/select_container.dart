@@ -27,7 +27,7 @@ class SelectContainer extends StatelessWidget {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => DetailScreen(title: name)));
+                        builder: (context) => DetailScreen(room: name)));
               } else if (name == "Fan") {
                 // Navigator.pop(context);
                 Navigator.push(

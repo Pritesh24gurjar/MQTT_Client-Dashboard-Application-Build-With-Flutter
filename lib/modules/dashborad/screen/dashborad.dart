@@ -73,12 +73,12 @@ class _Dashborad extends State<Dashborad> {
   //       image: 'assets/images/bathroom.jpg', name: 'Bathroom', temp: '27'),
   // ];
 
-  List<DevicesModel> _listDevices = [
-    DevicesModel(image: 'assets/images/microwave.png', name: 'Microwave'),
-    DevicesModel(image: 'assets/images/range_hood.png', name: 'Range hood'),
-    DevicesModel(image: 'assets/images/tv.png', name: 'TV'),
-    DevicesModel(image: 'assets/images/refrigerator.png', name: 'Refrigerator'),
-  ];
+  // List<DevicesModel> _listDevices = [
+  //   DevicesModel(image: 'assets/images/microwave.png', name: 'Microwave'),
+  //   DevicesModel(image: 'assets/images/range_hood.png', name: 'Range hood'),
+  //   DevicesModel(image: 'assets/images/tv.png', name: 'TV'),
+  //   DevicesModel(image: 'assets/images/refrigerator.png', name: 'Refrigerator'),
+  // ];
 
   @override
   Widget build(BuildContext context) {
@@ -146,8 +146,7 @@ class _Dashborad extends State<Dashborad> {
                                           MaterialPageRoute(
                                               builder: (context) =>
                                                   DetailScreen(
-                                                    title: snapshot
-                                                        .data[index].title,
+                                                    room: snapshot.data[index],
                                                   )));
                                     },
                                   ),

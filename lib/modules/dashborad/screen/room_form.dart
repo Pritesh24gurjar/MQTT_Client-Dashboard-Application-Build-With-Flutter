@@ -96,169 +96,201 @@ class _MyHomePageState extends State<Room_form> {
           //   ),
           // ],
         ),
-        body: Form(
-          key: _formKeyValue,
-          // autovalidateMode: true,
-          child: new ListView(
-            padding: const EdgeInsets.symmetric(horizontal: 15.0),
-            children: <Widget>[
-              SizedBox(height: 20.0),
-              new TextFormField(
-                  controller: TextEditingController()..text = _taskTitle,
-                  decoration: const InputDecoration(
-                    icon: const Icon(
-                      FontAwesomeIcons.tv,
-                      color: Colors.blueAccent,
-                    ),
-                    hintText: 'Enter your device name',
-                    labelText: 'Device name ',
-                  ),
-                  onChanged: (value) async {
-                    await _dbHelper.updateRoomTitle(_taskId, value);
-                  },
-                  keyboardType: TextInputType.text),
-              new TextFormField(
-                  controller: TextEditingController()..text = _devSub,
-                  decoration: const InputDecoration(
-                    icon: const Icon(
-                      Icons.topic,
-                      color: Colors.blueAccent,
-                    ),
-                    hintText: 'Enter Topic to Subscribe',
-                    labelText: 'Topic',
-                  ),
-                  onChanged: (value) async {
-                    await _dbHelper.updateRoomSub(_taskId, value);
-                  }),
+        body: Stack(
+          children: <Widget>[
+            Form(
+              key: _formKeyValue,
+              // autovalidateMode: true,
+              child: new ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                children: <Widget>[
+                  SizedBox(height: 20.0),
+                  new TextFormField(
+                      controller: TextEditingController()..text = _taskTitle,
+                      decoration: const InputDecoration(
+                        icon: const Icon(
+                          FontAwesomeIcons.tv,
+                          color: Colors.blueAccent,
+                        ),
+                        hintText: 'Enter your device name',
+                        labelText: 'Device name ',
+                      ),
+                      onChanged: (value) async {
+                        await _dbHelper.updateRoomTitle(_taskId, value);
+                      },
+                      keyboardType: TextInputType.text),
+                  new TextFormField(
+                      controller: TextEditingController()..text = _devSub,
+                      decoration: const InputDecoration(
+                        icon: const Icon(
+                          Icons.topic,
+                          color: Colors.blueAccent,
+                        ),
+                        hintText: 'Enter Topic to Subscribe',
+                        labelText: 'Topic',
+                      ),
+                      onChanged: (value) async {
+                        await _dbHelper.updateRoomSub(_taskId, value);
+                      }),
 
-              // new TextFormField(
-              //   decoration: const InputDecoration(
-              //     icon: const Icon(
-              //       Icons.account_tree,
-              //       color: Colors.blueAccent,
-              //     ),
-              //     hintText: 'Enter your Email Address',
-              //     labelText: 'Email',
-              //   ),
-              //   keyboardType: TextInputType.emailAddress,
-              // ),
-              // SizedBox(height: 20.0),
-              // Row(
-              //   mainAxisAlignment: MainAxisAlignment.center,
-              //   children: <Widget>[
-              //     Icon(
-              //       FontAwesomeIcons.moneyBill,
-              //       size: 25.0,
-              //       color: Colors.blueAccent,
-              //     ),
-              //     SizedBox(width: 50.0),
-              //     // DropdownButton(
-              //     //   items: _accountType
-              //     //       .map((value) => DropdownMenuItem(
-              //     //             child: Text(
-              //     //               value,
-              //     //               style: TextStyle(color: Color(0xff11b719)),
-              //     //             ),
-              //     //             value: value,
-              //     //           ))
-              //     //       .toList(),
-              //     //   onChanged: (selectedAccountType) {
-              //     //     print('$selectedAccountType');
-              //     //     setState(() {
-              //     //       selectedType = selectedAccountType;
-              //     //     });
-              //     //   },
-              //     //   value: selectedType,
-              //     //   isExpanded: false,
-              //     //   hint: Text(
-              //     //     'Choose Account Type',
-              //     //     style: TextStyle(color: Color(0xff11b719)),
-              //     //   ),
-              //     // )
-              //   ],
-              // ),
-              // SizedBox(height: 40.0),
-              // _buildQosChoiceChips(),
-              // StreamBuilder<QuerySnapshot>(
-              //     // stream: Firestore.instance.collection("currency").snapshots(),
-              //     builder: (context, snapshot) {
-              //       if (!snapshot.hasData)
-              //         const Text("Loading.....");
-              //       else {
-              //         List<DropdownMenuItem> currencyItems = [];
-              //         for (int i = 0; i < snapshot.data.documents.length; i++) {
-              //           DocumentSnapshot snap = snapshot.data.documents[i];
-              //           currencyItems.add(
-              //             DropdownMenuItem(
-              //               child: Text(
-              //                 snap.documentID,
-              //                 style: TextStyle(color: Color(0xff11b719)),
-              //               ),
-              //               value: "${snap.documentID}",
-              //             ),
-              //           );
-              //         }
-              //         return Row(
-              //           mainAxisAlignment: MainAxisAlignment.center,
-              //           children: <Widget>[
-              //             Icon(FontAwesomeIcons.coins,
-              //                 size: 25.0, color: Color(0xff11b719)),
-              //             SizedBox(width: 50.0),
-              //             DropdownButton(
-              //               items: currencyItems,
-              //               onChanged: (currencyValue) {
-              //                 final snackBar = SnackBar(
-              //                   content: Text(
-              //                     'Selected Currency value is $currencyValue',
-              //                     style: TextStyle(color: Color(0xff11b719)),
-              //                   ),
-              //                 );
-              //                 Scaffold.of(context).showSnackBar(snackBar);
-              //                 setState(() {
-              //                   selectedCurrency = currencyValue;
-              //                 });
-              //               },
-              //               value: selectedCurrency,
-              //               isExpanded: false,
-              //               hint: new Text(
-              //                 "Choose Currency Type",
-              //                 style: TextStyle(color: Color(0xff11b719)),
-              //               ),
-              //             ),
-              //           ],
-              //         );
-              //       }
-              //     }),
-              // SizedBox(
-              //   height: 5.0,
-              // ),
-              // Container(
-              //   decoration: BoxDecoration(
-              //       border:
-              //           Border(bottom: BorderSide(color: theme.dividerColor))),
-              //   child: Row(children: <Widget>[
-              //     Checkbox(
-              //         value: _retainValue,
-              //         onChanged: (bool value) {
-              //           setState(() async {
-              //             _retainValue = value;
-              //             _saveNeeded = true;
-              //             await _dbHelper.updateDevicesretain(
-              //                 _taskId, _retainValue.toString());
-              //           });
-              //         }),
-              //     const Text('Retain message'),
-              //     SizedBox(
-              //       height: 15.0,
-              //     ),
-              //   ]),
-              // ),
-              SizedBox(
-                height: 15.0,
+                  // new TextFormField(
+                  //   decoration: const InputDecoration(
+                  //     icon: const Icon(
+                  //       Icons.account_tree,
+                  //       color: Colors.blueAccent,
+                  //     ),
+                  //     hintText: 'Enter your Email Address',
+                  //     labelText: 'Email',
+                  //   ),
+                  //   keyboardType: TextInputType.emailAddress,
+                  // ),
+                  // SizedBox(height: 20.0),
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.center,
+                  //   children: <Widget>[
+                  //     Icon(
+                  //       FontAwesomeIcons.moneyBill,
+                  //       size: 25.0,
+                  //       color: Colors.blueAccent,
+                  //     ),
+                  //     SizedBox(width: 50.0),
+                  //     // DropdownButton(
+                  //     //   items: _accountType
+                  //     //       .map((value) => DropdownMenuItem(
+                  //     //             child: Text(
+                  //     //               value,
+                  //     //               style: TextStyle(color: Color(0xff11b719)),
+                  //     //             ),
+                  //     //             value: value,
+                  //     //           ))
+                  //     //       .toList(),
+                  //     //   onChanged: (selectedAccountType) {
+                  //     //     print('$selectedAccountType');
+                  //     //     setState(() {
+                  //     //       selectedType = selectedAccountType;
+                  //     //     });
+                  //     //   },
+                  //     //   value: selectedType,
+                  //     //   isExpanded: false,
+                  //     //   hint: Text(
+                  //     //     'Choose Account Type',
+                  //     //     style: TextStyle(color: Color(0xff11b719)),
+                  //     //   ),
+                  //     // )
+                  //   ],
+                  // ),
+                  // SizedBox(height: 40.0),
+                  // _buildQosChoiceChips(),
+                  // StreamBuilder<QuerySnapshot>(
+                  //     // stream: Firestore.instance.collection("currency").snapshots(),
+                  //     builder: (context, snapshot) {
+                  //       if (!snapshot.hasData)
+                  //         const Text("Loading.....");
+                  //       else {
+                  //         List<DropdownMenuItem> currencyItems = [];
+                  //         for (int i = 0; i < snapshot.data.documents.length; i++) {
+                  //           DocumentSnapshot snap = snapshot.data.documents[i];
+                  //           currencyItems.add(
+                  //             DropdownMenuItem(
+                  //               child: Text(
+                  //                 snap.documentID,
+                  //                 style: TextStyle(color: Color(0xff11b719)),
+                  //               ),
+                  //               value: "${snap.documentID}",
+                  //             ),
+                  //           );
+                  //         }
+                  //         return Row(
+                  //           mainAxisAlignment: MainAxisAlignment.center,
+                  //           children: <Widget>[
+                  //             Icon(FontAwesomeIcons.coins,
+                  //                 size: 25.0, color: Color(0xff11b719)),
+                  //             SizedBox(width: 50.0),
+                  //             DropdownButton(
+                  //               items: currencyItems,
+                  //               onChanged: (currencyValue) {
+                  //                 final snackBar = SnackBar(
+                  //                   content: Text(
+                  //                     'Selected Currency value is $currencyValue',
+                  //                     style: TextStyle(color: Color(0xff11b719)),
+                  //                   ),
+                  //                 );
+                  //                 Scaffold.of(context).showSnackBar(snackBar);
+                  //                 setState(() {
+                  //                   selectedCurrency = currencyValue;
+                  //                 });
+                  //               },
+                  //               value: selectedCurrency,
+                  //               isExpanded: false,
+                  //               hint: new Text(
+                  //                 "Choose Currency Type",
+                  //                 style: TextStyle(color: Color(0xff11b719)),
+                  //               ),
+                  //             ),
+                  //           ],
+                  //         );
+                  //       }
+                  //     }),
+                  // SizedBox(
+                  //   height: 5.0,
+                  // ),
+                  // Container(
+                  //   decoration: BoxDecoration(
+                  //       border:
+                  //           Border(bottom: BorderSide(color: theme.dividerColor))),
+                  //   child: Row(children: <Widget>[
+                  //     Checkbox(
+                  //         value: _retainValue,
+                  //         onChanged: (bool value) {
+                  //           setState(() async {
+                  //             _retainValue = value;
+                  //             _saveNeeded = true;
+                  //             await _dbHelper.updateDevicesretain(
+                  //                 _taskId, _retainValue.toString());
+                  //           });
+                  //         }),
+                  //     const Text('Retain message'),
+                  //     SizedBox(
+                  //       height: 15.0,
+                  //     ),
+                  //   ]),
+                  // ),
+                  SizedBox(
+                    height: 15.0,
+                  ),
+                  _buildConnectBtn(),
+                ],
               ),
-              _buildConnectBtn(),
-            ],
-          ),
+            ),
+            Visibility(
+              visible: _contentVisile,
+              child: Positioned(
+                bottom: 24.0,
+                right: 24.0,
+                child: GestureDetector(
+                  onTap: () async {
+                    if (_taskId != 0) {
+                      await _dbHelper.delete_room(_taskId);
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: Container(
+                    width: 60.0,
+                    height: 60.0,
+                    decoration: BoxDecoration(
+                      color: Color(0xFFFE3577),
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                    child: Image(
+                      image: AssetImage(
+                        "assets/images/delete_icon.png",
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ));
   }
 

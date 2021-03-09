@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:mqtt_app/helpers/database_helper.dart';
 import 'package:mqtt_app/models/models.dart';
 import 'package:mqtt_app/models/select_model.dart';
 import 'package:mqtt_app/modules/dashborad/screen/dashborad.dart';
+import 'package:mqtt_app/modules/dashborad/screen/roomdivform.dart';
 // import 'package:mqtt_app/widgets/custom_slider.dart';
 import 'package:mqtt_app/widgets/lighting_card.dart';
 import 'package:mqtt_app/widgets/widgets.dart';
@@ -12,14 +14,15 @@ import 'package:mqtt_app/widgets/widgets.dart';
 // import 'package:smart_home/widgets/widgets.dart';
 
 class DetailScreen extends StatefulWidget {
-  final String title;
-  DetailScreen({@required this.title});
+  final room;
+  DetailScreen({@required this.room});
 
   @override
   _DetailScreenState createState() => _DetailScreenState();
 }
 
 class _DetailScreenState extends State<DetailScreen> {
+  DatabaseHelper _dbHelper = DatabaseHelper();
   List<SelectModel> _listSelect = [
     SelectModel(
       icon: 'assets/images/light.png',
@@ -73,11 +76,28 @@ class _DetailScreenState extends State<DetailScreen> {
                   MaterialPageRoute(builder: (context) => Dashborad()));
             }),
         title: Text(
-          widget.title,
+          widget.room.title,
           style: TextStyle(color: Colors.black87),
         ),
         centerTitle: true,
         iconTheme: IconThemeData(color: Colors.grey),
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.add_circle,
+              size: 30.0,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) => RoomDivForm(
+                  roomdivnfo: widget.room,
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -97,17 +117,38 @@ class _DetailScreenState extends State<DetailScreen> {
               ),
             ),
             Container(
-              height: _height * 0.3,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: _listLighting.length,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding:
-                        const EdgeInsets.only(right: 8.0, top: 16, bottom: 16),
-                    child: LightingCard(
-                      title: _listLighting[index].name,
-                      image: _listLighting[index].image,
+              child: FutureBuilder(
+                initialData: [],
+                future: _dbHelper.getRoomdiv(widget.room.id),
+                builder: (context, snapshot) {
+                  return Container(
+                    height: _height * 0.3,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: snapshot.data.length,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          onLongPress: () async {
+                            //
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => RoomDivForm(
+                                          roomdivnfo: widget.room,
+                                        )));
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                right: 8.0, top: 16, bottom: 16),
+                            child: LightingCard(
+                              title: snapshot.data[index].title,
+                              image: 'assets/images/ceiling_lighting.png',
+                              pub: snapshot.data[index].pub,
+                              qos: snapshot.data[index].qos,
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   );
                 },
