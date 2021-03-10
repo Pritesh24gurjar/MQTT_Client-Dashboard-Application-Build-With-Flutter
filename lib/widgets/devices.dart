@@ -11,7 +11,6 @@ class Devices extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     double _width = MediaQuery.of(context).size.width;
     double _height = MediaQuery.of(context).size.height;
 
@@ -20,7 +19,7 @@ class Devices extends StatelessWidget {
       children: [
         Container(
           width: _width * 0.4,
-          height: _height * 0.18,
+          height: _height * 0.17,
           padding: EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: Colors.white,

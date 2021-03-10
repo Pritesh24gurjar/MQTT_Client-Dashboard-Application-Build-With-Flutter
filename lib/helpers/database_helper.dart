@@ -243,6 +243,11 @@ class DatabaseHelper {
     });
   }
 
+  Future<void> updateRoomdivTitle(int id, String title) async {
+    Database _db = await database();
+    await _db.rawUpdate("UPDATE roomdiv SET title = '$title' WHERE id = '$id'");
+  }
+
   Future<void> updateRoomdivPub(int id, String pub) async {
     Database _db = await database();
     await _db.rawUpdate("UPDATE roomdiv SET pub = '$pub' WHERE id = '$id'");

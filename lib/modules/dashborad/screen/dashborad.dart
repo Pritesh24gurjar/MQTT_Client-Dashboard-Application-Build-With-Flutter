@@ -180,7 +180,7 @@ class _Dashborad extends State<Dashborad> {
                             itemCount: snapshot.data.length,
                             itemBuilder: (context, index) {
                               return Container(
-                                child: SingleChildScrollView(
+                                child: Container(
                                   child: Padding(
                                     padding: const EdgeInsets.only(top: 16.0),
                                     child: GestureDetector(

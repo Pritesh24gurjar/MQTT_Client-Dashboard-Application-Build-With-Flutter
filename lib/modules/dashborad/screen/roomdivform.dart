@@ -5,15 +5,15 @@ import 'package:mqtt_app/helpers/database_helper.dart';
 import 'package:mqtt_app/models/devices.dart';
 import 'package:mqtt_app/models/roomdevices.dart';
 
-class RoomDivForm extends StatefulWidget {
+class RoomDivSet extends StatefulWidget {
   final roomdivnfo;
 
-  RoomDivForm({@required this.roomdivnfo});
+  RoomDivSet({@required this.roomdivnfo});
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<RoomDivForm> {
+class _MyHomePageState extends State<RoomDivSet> {
   final TextEditingController _title = TextEditingController();
   final TextEditingController _topic = TextEditingController();
   DatabaseHelper _dbHelper = DatabaseHelper();

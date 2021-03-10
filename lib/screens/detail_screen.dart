@@ -5,6 +5,7 @@ import 'package:mqtt_app/models/models.dart';
 import 'package:mqtt_app/models/select_model.dart';
 import 'package:mqtt_app/modules/dashborad/screen/dashborad.dart';
 import 'package:mqtt_app/modules/dashborad/screen/roomdivform.dart';
+import 'package:mqtt_app/modules/dashborad/screen/roomdivset.dart';
 // import 'package:mqtt_app/widgets/custom_slider.dart';
 import 'package:mqtt_app/widgets/lighting_card.dart';
 import 'package:mqtt_app/widgets/widgets.dart';
@@ -91,7 +92,7 @@ class _DetailScreenState extends State<DetailScreen> {
             onPressed: () {
               showDialog(
                 context: context,
-                builder: (BuildContext context) => RoomDivForm(
+                builder: (BuildContext context) => RoomDivSet(
                   roomdivnfo: widget.room,
                 ),
               );
@@ -129,12 +130,13 @@ class _DetailScreenState extends State<DetailScreen> {
                       itemBuilder: (context, index) {
                         return GestureDetector(
                           onLongPress: () async {
-                            //
+                            //_dbHelper.getRoomdiv(widget.room.id)
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => RoomDivForm(
-                                          roomdivnfo: widget.room,
+                                          // roomdivinfo: widget.room,
+                                          roomdevices: snapshot.data[index],
                                         )));
                           },
                           child: Padding(
@@ -161,7 +163,11 @@ class _DetailScreenState extends State<DetailScreen> {
             SizedBox(
               height: 16,
             ),
-            CustomSlider(),
+            GestureDetector(
+                onLongPress: () {
+                  //
+                },
+                child: CustomSlider(roomdivinfo: widget.room)),
             SizedBox(
               height: 16,
             ),
