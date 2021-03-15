@@ -291,20 +291,23 @@ class MQTTManager extends ChangeNotifier {
         'EXAMPLE::OnConnected client callback - Client connection was sucessful');
   }
 
-  void subScribeTo(String topic) {
+  String subScribeTo(String topic) {
     // Save topic for future use
     _topic = topic;
+    var _message_recv;
     _client.subscribe(topic, MqttQos.atLeastOnce);
     _client.updates.listen((List<MqttReceivedMessage<MqttMessage>> c) {
       final MqttPublishMessage recMess = c[0].payload;
       final String pt =
           MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
+      _message_recv = pt;
       _currentState.setReceivedText(pt);
       updateState();
       print(
           'EXAMPLE::Change notification:: topic is <${c[0].topic}>, payload is <-- $pt -->');
       print('');
     });
+    return _message_recv;
   }
 
   /// Unsubscribe from a topic

@@ -10,6 +10,7 @@ import 'package:mqtt_app/modules/core/managers/MQTTManager.dart';
 import 'package:mqtt_app/modules/core/models/MQTTAppState.dart';
 import 'package:mqtt_app/screens/deviceUpdate.dart';
 import 'package:mqtt_app/widgets/custum_dialog.dart';
+import 'package:mqtt_client/mqtt_client.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -79,12 +80,21 @@ class _Dashborad extends State<Dashborad> {
   //   DevicesModel(image: 'assets/images/tv.png', name: 'TV'),
   //   DevicesModel(image: 'assets/images/refrigerator.png', name: 'Refrigerator'),
   // ];
+  String sub(a) {
+    if (_manager.currentState.getAppConnectionState ==
+        MQTTAppConnectionState.connected) {
+      var b = _manager.subScribeTo(a);
+      print("------------------------- $b ----------------------");
+      return b;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     double _height = MediaQuery.of(context).size.height;
     double _width = MediaQuery.of(context).size.width;
     _manager = Provider.of<MQTTManager>(context);
+
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: Color(0xFFF6F6F6),
@@ -139,7 +149,7 @@ class _Dashborad extends State<Dashborad> {
                                   child: CateContainer(
                                     image: 'assets/images/livingroom.jpg',
                                     name: snapshot.data[index].title,
-                                    temp: '30',
+                                    temp: sub(snapshot.data[index].sub),
                                     onTap: () {
                                       Navigator.push(
                                           context,

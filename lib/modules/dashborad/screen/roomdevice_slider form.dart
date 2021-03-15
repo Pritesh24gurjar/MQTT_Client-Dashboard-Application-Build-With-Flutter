@@ -5,23 +5,19 @@ import 'package:mqtt_app/helpers/database_helper.dart';
 import 'package:mqtt_app/models/devices.dart';
 import 'package:mqtt_app/models/roomdevices.dart';
 
-class RoomDivForm extends StatefulWidget {
+class RoomDivForm_slider extends StatefulWidget {
   // final RoomDivForm roomdivinfo;
   final Roomdevices roomdevices;
 
-  RoomDivForm({@required this.roomdevices});
+  RoomDivForm_slider({@required this.roomdevices});
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<RoomDivForm> {
+class _MyHomePageState extends State<RoomDivForm_slider> {
   var selectedCurrency, selectedType;
   final GlobalKey<FormState> _formKeyValue = new GlobalKey<FormState>();
-  // List<String> _accountType = <String>[
-  //   'Savings',
-  //   'Deposit',
-  //   'Checking',
-  //   'Brokerage'
+
   // ];
   DatabaseHelper _dbHelper = DatabaseHelper();
   int _qosValue = 0;
@@ -116,7 +112,7 @@ class _MyHomePageState extends State<RoomDivForm> {
                       labelText: 'Device name ',
                     ),
                     onChanged: (value) async {
-                      await _dbHelper.updateRoomdivTitle(_taskId, value);
+                      await _dbHelper.updateRoomdivTitle_sl(_taskId, value);
                     },
                     keyboardType: TextInputType.text),
                 new TextFormField(
@@ -130,7 +126,7 @@ class _MyHomePageState extends State<RoomDivForm> {
                       labelText: 'Topic',
                     ),
                     onChanged: (value) async {
-                      await _dbHelper.updateRoomdivPub(_taskId, value);
+                      await _dbHelper.updateRoomdivPub_sl(_taskId, value);
                     }),
 
                 // new TextFormField(
@@ -234,27 +230,7 @@ class _MyHomePageState extends State<RoomDivForm> {
                 SizedBox(
                   height: 5.0,
                 ),
-                Container(
-                  decoration: BoxDecoration(
-                      border: Border(
-                          bottom: BorderSide(color: theme.dividerColor))),
-                  child: Row(children: <Widget>[
-                    Checkbox(
-                        value: _retainValue,
-                        onChanged: (bool value) {
-                          setState(() async {
-                            _retainValue = value;
-                            _saveNeeded = true;
-                            await _dbHelper.updateDevicesretain(
-                                _taskId, _retainValue.toString());
-                          });
-                        }),
-                    const Text('Retain message'),
-                    SizedBox(
-                      height: 15.0,
-                    ),
-                  ]),
-                ),
+
                 SizedBox(
                   height: 15.0,
                 ),
@@ -270,7 +246,7 @@ class _MyHomePageState extends State<RoomDivForm> {
               child: GestureDetector(
                 onTap: () async {
                   if (_taskId != 0) {
-                    await _dbHelper.delete_room_div(_taskId);
+                    await _dbHelper.delete_room_div_sl(_taskId);
                     Navigator.pop(context);
                   }
                 },
@@ -334,7 +310,7 @@ class _MyHomePageState extends State<RoomDivForm> {
             onSelected: (bool selected) {
               setState(() async {
                 _qosValue = selected ? index : null;
-                await _dbHelper.updateRoomdivQos(_taskId, _qosValue);
+                await _dbHelper.updateRoomdivQos_sl(_taskId, _qosValue);
               });
             },
           );

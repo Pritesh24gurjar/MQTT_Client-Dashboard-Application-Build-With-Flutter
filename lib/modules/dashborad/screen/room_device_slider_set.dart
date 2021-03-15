@@ -5,15 +5,15 @@ import 'package:mqtt_app/helpers/database_helper.dart';
 import 'package:mqtt_app/models/devices.dart';
 import 'package:mqtt_app/models/roomdevices.dart';
 
-class RoomDivset extends StatefulWidget {
+class RoomDivSet_sl extends StatefulWidget {
   final roomdivnfo;
 
-  RoomDivset({@required this.roomdivnfo});
+  RoomDivSet_sl({@required this.roomdivnfo});
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<RoomDivset> {
+class _MyHomePageState extends State<RoomDivSet_sl> {
   final TextEditingController _title = TextEditingController();
   final TextEditingController _topic = TextEditingController();
   DatabaseHelper _dbHelper = DatabaseHelper();
@@ -215,7 +215,7 @@ class _MyHomePageState extends State<RoomDivset> {
             // qos: _qosValue,
           );
 
-          _deviceId = await _dbHelper.insertRoomdiv(_newRoomdiv);
+          _deviceId = await _dbHelper.insertRoomdiv_sl(_newRoomdiv);
         },
         padding: EdgeInsets.all(10.0),
         shape: RoundedRectangleBorder(

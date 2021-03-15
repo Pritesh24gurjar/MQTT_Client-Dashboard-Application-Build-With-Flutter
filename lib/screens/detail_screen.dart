@@ -4,8 +4,10 @@ import 'package:mqtt_app/helpers/database_helper.dart';
 import 'package:mqtt_app/models/models.dart';
 import 'package:mqtt_app/models/select_model.dart';
 import 'package:mqtt_app/modules/dashborad/screen/dashborad.dart';
+import 'package:mqtt_app/modules/dashborad/screen/roomdevice_slider%20form.dart';
 import 'package:mqtt_app/modules/dashborad/screen/roomdivform.dart';
 import 'package:mqtt_app/modules/dashborad/screen/roomdivset.dart';
+import 'package:mqtt_app/widgets/cutom_dialog_roomdiv.dart';
 // import 'package:mqtt_app/widgets/custom_slider.dart';
 import 'package:mqtt_app/widgets/lighting_card.dart';
 import 'package:mqtt_app/widgets/widgets.dart';
@@ -82,7 +84,7 @@ class _DetailScreenState extends State<DetailScreen> {
         ),
         centerTitle: true,
         iconTheme: IconThemeData(color: Colors.grey),
-        actions: [
+        actions: <Widget>[
           IconButton(
             icon: Icon(
               Icons.add_circle,
@@ -92,8 +94,15 @@ class _DetailScreenState extends State<DetailScreen> {
             onPressed: () {
               showDialog(
                 context: context,
-                builder: (BuildContext context) => RoomDivSet(
-                  roomdivnfo: widget.room,
+                builder: (BuildContext context) => CustomDialogroomdiv(
+                  title: "Would you like to create Rooms and device tiles?",
+                  description:
+                      "By creating rooms you can access to other devices which cames under room",
+                  primaryButtonText: "Create light",
+                  primaryButtonRoute: "/Device",
+                  secondaryButtonText: "Create slider",
+                  secondaryButtonRoute: "/Room",
+                  roomdivinfo: widget.room,
                 ),
               );
             },
@@ -163,11 +172,46 @@ class _DetailScreenState extends State<DetailScreen> {
             SizedBox(
               height: 16,
             ),
-            GestureDetector(
-                onLongPress: () {
-                  //
+            Container(
+              child: FutureBuilder(
+                initialData: [],
+                future: _dbHelper.getRoomdiv_sl(widget.room.id),
+                builder: (context, snapshot) {
+                  return Container(
+                    height: _height * 0.14,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: snapshot.data.length,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          onLongPress: () async {
+                            //_dbHelper.getRoomdiv(widget.room.id)
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => RoomDivForm_slider(
+                                          // roomdivinfo: widget.room,
+                                          roomdevices: snapshot.data[index],
+                                        )));
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                right: 8.0, top: 16, bottom: 16),
+                            child: CustomSlider(
+                              title: snapshot.data[index].title,
+                              // image: 'assets/images/ceiling_lighting.png',
+                              roomdivinfo: snapshot.data[index],
+                              pub: snapshot.data[index].pub,
+                              qos: snapshot.data[index].qos,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  );
                 },
-                child: CustomSlider(roomdivinfo: widget.room)),
+              ),
+            ),
             SizedBox(
               height: 16,
             ),

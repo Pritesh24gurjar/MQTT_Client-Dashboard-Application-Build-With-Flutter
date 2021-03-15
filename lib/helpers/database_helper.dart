@@ -10,7 +10,7 @@ import 'package:mqtt_app/models/task.dart';
 class DatabaseHelper {
   Future<Database> database() async {
     return openDatabase(
-      join(await getDatabasesPath(), 'xyz3.db'),
+      join(await getDatabasesPath(), 'xyz4.db'),
       onCreate: (db, version) async {
         await db.execute(
             "CREATE TABLE broker(id INTEGER PRIMARY KEY, title TEXT, description TEXT, clientid TEXT,username TEXT,password TEXT)");
@@ -22,6 +22,8 @@ class DatabaseHelper {
             "CREATE TABLE rooms(id INTEGER PRIMARY KEY , title TEXT, sub TEXT )");
         await db.execute(
             "CREATE TABLE roomdiv(id INTEGER PRIMARY KEY, roomid INTEGER, title TEXT, pub TEXT , qos INTEGER)");
+        await db.execute(
+            "CREATE TABLE roomdiv_sl(id INTEGER PRIMARY KEY, roomid INTEGER, title TEXT, pub TEXT , qos INTEGER)");
         return db;
       },
       version: 1,
@@ -261,5 +263,55 @@ class DatabaseHelper {
   Future<void> delete_room_div(int id) async {
     Database _db = await database();
     await _db.rawDelete("DELETE FROM roomdiv WHERE id = '$id'");
+  }
+
+  //////////// room device slider  ////////////////
+  Future<int> insertRoomdiv_sl(Roomdevices roomdevices) async {
+    int roomDivId = 0;
+    Database _db = await database();
+    await _db
+        .insert('roomdiv_sl', roomdevices.toMap(),
+            conflictAlgorithm: ConflictAlgorithm.replace)
+        .then((value) {
+      roomDivId = value;
+    });
+    print(
+        '-------------\n\n\n\n rrom device slider \n\n\n\n----------------------');
+    return roomDivId;
+  }
+
+  Future<List<Roomdevices>> getRoomdiv_sl(int roomid) async {
+    Database _db = await database();
+    List<Map<String, dynamic>> roomMap =
+        await _db.rawQuery("SELECT * FROM roomdiv_sl WHERE roomid = $roomid");
+    return List.generate(roomMap.length, (index) {
+      return Roomdevices(
+          id: roomMap[index]['id'],
+          title: roomMap[index]['title'],
+          roomid: roomMap[index]['roomid'],
+          qos: roomMap[index]['qos'],
+          pub: roomMap[index]['pub']);
+    });
+  }
+
+  Future<void> updateRoomdivTitle_sl(int id, String title) async {
+    Database _db = await database();
+    await _db
+        .rawUpdate("UPDATE roomdiv_sl SET title = '$title' WHERE id = '$id'");
+  }
+
+  Future<void> updateRoomdivPub_sl(int id, String pub) async {
+    Database _db = await database();
+    await _db.rawUpdate("UPDATE roomdiv_sl SET pub = '$pub' WHERE id = '$id'");
+  }
+
+  Future<void> updateRoomdivQos_sl(int id, int qos) async {
+    Database _db = await database();
+    await _db.rawUpdate("UPDATE roomdiv_sl SET qos = '$qos' WHERE id = '$id'");
+  }
+
+  Future<void> delete_room_div_sl(int id) async {
+    Database _db = await database();
+    await _db.rawDelete("DELETE FROM roomdiv_sl WHERE id = '$id'");
   }
 }
