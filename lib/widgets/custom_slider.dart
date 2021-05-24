@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mqtt_app/models/room.dart';
 import 'package:mqtt_app/modules/core/managers/MQTTManager.dart';
-import 'package:mqtt_app/modules/dashborad/screen/roomdevice_slider%20form.dart';
+import 'package:mqtt_app/modules/dashborad/screen/updatePage/roomdevice_slider%20form.dart';
 import 'package:provider/provider.dart';
 
 class CustomSlider extends StatefulWidget {
@@ -58,7 +58,7 @@ class _CustomSliderState extends State<CustomSlider> {
                           RoundSliderThumbShape(enabledThumbRadius: 12.0),
                       overlayColor: Colors.white38,
                       overlayShape:
-                          RoundSliderOverlayShape(overlayRadius: 20.0),
+                          RoundSliderOverlayShape(overlayRadius: 18.0),
                     ),
                     child: Slider(
                       value: value,

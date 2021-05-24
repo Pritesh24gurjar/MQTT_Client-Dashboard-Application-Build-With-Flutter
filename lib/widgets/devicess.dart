@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class Devices extends StatelessWidget {
+class Devicess extends StatelessWidget {
   final String image;
   final String name;
 
-  Devices({
+  Devicess({
     @required this.image,
     @required this.name,
   });

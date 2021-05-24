@@ -46,7 +46,7 @@ class _MyHomePageState extends State<Device_form> {
       _taskTitle = widget.devices.title;
       _devSub = widget.devices.sub;
       _taskId = widget.devices.id;
-      _devQos = widget.devices.qos;
+      _qosValue = widget.devices.qos;
       _devRetain = widget.devices.retain;
     }
 
@@ -71,12 +71,6 @@ class _MyHomePageState extends State<Device_form> {
     final ThemeData theme = Theme.of(context);
     return Scaffold(
         appBar: AppBar(
-          // leading: IconButton(
-          //     icon: Icon(
-          //       FontAwesomeIcons.bars,
-          //       color: Colors.white,
-          //     ),
-          //     onPressed: () {}),
           title: Container(
             alignment: Alignment.centerLeft,
             child: Text("Update device",
@@ -84,16 +78,6 @@ class _MyHomePageState extends State<Device_form> {
                   color: Colors.white,
                 )),
           ),
-          // actions: <Widget>[
-          //   IconButton(
-          //     icon: Icon(
-          //       FontAwesomeIcons.coins,
-          //       size: 20.0,
-          //       color: Colors.white,
-          //     ),
-          //     onPressed: null,
-          //   ),
-          // ],
         ),
         body: Stack(children: <Widget>[
           Form(
@@ -131,104 +115,9 @@ class _MyHomePageState extends State<Device_form> {
                       await _dbHelper.updateDevicesSub(_taskId, value);
                     }),
 
-                // new TextFormField(
-                //   decoration: const InputDecoration(
-                //     icon: const Icon(
-                //       Icons.account_tree,
-                //       color: Colors.blueAccent,
-                //     ),
-                //     hintText: 'Enter your Email Address',
-                //     labelText: 'Email',
-                //   ),
-                //   keyboardType: TextInputType.emailAddress,
-                // ),
-                // SizedBox(height: 20.0),
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.center,
-                //   children: <Widget>[
-                //     Icon(
-                //       FontAwesomeIcons.moneyBill,
-                //       size: 25.0,
-                //       color: Colors.blueAccent,
-                //     ),
-                //     SizedBox(width: 50.0),
-                //     // DropdownButton(
-                //     //   items: _accountType
-                //     //       .map((value) => DropdownMenuItem(
-                //     //             child: Text(
-                //     //               value,
-                //     //               style: TextStyle(color: Color(0xff11b719)),
-                //     //             ),
-                //     //             value: value,
-                //     //           ))
-                //     //       .toList(),
-                //     //   onChanged: (selectedAccountType) {
-                //     //     print('$selectedAccountType');
-                //     //     setState(() {
-                //     //       selectedType = selectedAccountType;
-                //     //     });
-                //     //   },
-                //     //   value: selectedType,
-                //     //   isExpanded: false,
-                //     //   hint: Text(
-                //     //     'Choose Account Type',
-                //     //     style: TextStyle(color: Color(0xff11b719)),
-                //     //   ),
-                //     // )
-                //   ],
-                // ),
                 SizedBox(height: 40.0),
                 _buildQosChoiceChips(),
-                // StreamBuilder<QuerySnapshot>(
-                //     // stream: Firestore.instance.collection("currency").snapshots(),
-                //     builder: (context, snapshot) {
-                //       if (!snapshot.hasData)
-                //         const Text("Loading.....");
-                //       else {
-                //         List<DropdownMenuItem> currencyItems = [];
-                //         for (int i = 0; i < snapshot.data.documents.length; i++) {
-                //           DocumentSnapshot snap = snapshot.data.documents[i];
-                //           currencyItems.add(
-                //             DropdownMenuItem(
-                //               child: Text(
-                //                 snap.documentID,
-                //                 style: TextStyle(color: Color(0xff11b719)),
-                //               ),
-                //               value: "${snap.documentID}",
-                //             ),
-                //           );
-                //         }
-                //         return Row(
-                //           mainAxisAlignment: MainAxisAlignment.center,
-                //           children: <Widget>[
-                //             Icon(FontAwesomeIcons.coins,
-                //                 size: 25.0, color: Color(0xff11b719)),
-                //             SizedBox(width: 50.0),
-                //             DropdownButton(
-                //               items: currencyItems,
-                //               onChanged: (currencyValue) {
-                //                 final snackBar = SnackBar(
-                //                   content: Text(
-                //                     'Selected Currency value is $currencyValue',
-                //                     style: TextStyle(color: Color(0xff11b719)),
-                //                   ),
-                //                 );
-                //                 Scaffold.of(context).showSnackBar(snackBar);
-                //                 setState(() {
-                //                   selectedCurrency = currencyValue;
-                //                 });
-                //               },
-                //               value: selectedCurrency,
-                //               isExpanded: false,
-                //               hint: new Text(
-                //                 "Choose Currency Type",
-                //                 style: TextStyle(color: Color(0xff11b719)),
-                //               ),
-                //             ),
-                //           ],
-                //         );
-                //       }
-                //     }),
+
                 SizedBox(
                   height: 5.0,
                 ),
@@ -332,7 +221,7 @@ class _MyHomePageState extends State<Device_form> {
             onSelected: (bool selected) {
               setState(() async {
                 _qosValue = selected ? index : null;
-                await _dbHelper.updateDevicesqos(_taskId, _qosValue.toString());
+                await _dbHelper.updateDevicesqos(_taskId, _qosValue);
               });
             },
           );

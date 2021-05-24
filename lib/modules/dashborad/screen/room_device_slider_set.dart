@@ -216,6 +216,8 @@ class _MyHomePageState extends State<RoomDivSet_sl> {
           );
 
           _deviceId = await _dbHelper.insertRoomdiv_sl(_newRoomdiv);
+
+          Navigator.pop(context);
         },
         padding: EdgeInsets.all(10.0),
         shape: RoundedRectangleBorder(

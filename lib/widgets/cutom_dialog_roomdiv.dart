@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:mqtt_app/modules/dashborad/screen/room_device_slider_set.dart';
-import 'package:mqtt_app/modules/dashborad/screen/roomdivform.dart';
+import 'package:mqtt_app/modules/dashborad/screen/updatePage/roomdivform.dart';
 import 'package:mqtt_app/modules/dashborad/screen/roomdivset.dart';
 import 'package:mqtt_app/modules/dashborad/screen/set_device.dart';
 import 'package:mqtt_app/modules/dashborad/screen/set_room.dart';

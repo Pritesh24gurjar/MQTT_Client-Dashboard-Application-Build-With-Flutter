@@ -1,3 +1,5 @@
+import 'package:mqtt_app/models/devicechoice.dart';
+import 'package:mqtt_app/models/devicechoicetemp.dart';
 import 'package:mqtt_app/models/devices.dart';
 import 'package:mqtt_app/models/room.dart';
 import 'package:mqtt_app/models/roomdevices.dart';
@@ -10,14 +12,19 @@ import 'package:mqtt_app/models/task.dart';
 class DatabaseHelper {
   Future<Database> database() async {
     return openDatabase(
-      join(await getDatabasesPath(), 'xyz4.db'),
+      join(await getDatabasesPath(), 'data20.db'),
       onCreate: (db, version) async {
         await db.execute(
-            "CREATE TABLE broker(id INTEGER PRIMARY KEY, title TEXT, description TEXT, clientid TEXT,username TEXT,password TEXT)");
+            "CREATE TABLE broker(id INTEGER PRIMARY KEY, servername TEXT, title TEXT, description TEXT, clientid TEXT,username TEXT,password TEXT,useWS BOOLEAN NOT NULL CHECK (useWS IN (0, 1)),useSSL BOOLEAN NOT NULL CHECK (useSSL IN (0, 1)))");
         await db.execute(
             "CREATE TABLE todo(id INTEGER PRIMARY KEY, taskId INTEGER, title TEXT, isDone INTEGER)");
         await db.execute(
-            "CREATE TABLE devices(id INTEGER PRIMARY KEY , title TEXT, sub TEXT , qos TEXT , retain TEXT )");
+          "CREATE TABLE devices(id INTEGER PRIMARY KEY , title TEXT, sub TEXT , qos INTEGER , retain TEXT ,style TEXT,savetext TEXT,min REAL,max REAL, saveweb TEXT,savewebclick TEXT, saveRadio TEXT)");
+        await db.execute(
+        "CREATE TABLE devicechoice(id INTEGER PRIMARY KEY,deviceid INTEGER , payloads TEXT, label TEXT)");
+
+        await db.execute(
+            "CREATE TABLE devicechoicetemp(id INTEGER PRIMARY KEY,deviceid INTEGER , payloads TEXT, label TEXT)");
         await db.execute(
             "CREATE TABLE rooms(id INTEGER PRIMARY KEY , title TEXT, sub TEXT )");
         await db.execute(
@@ -43,6 +50,11 @@ class DatabaseHelper {
 
     print('-------------\n\n\n\n\n\n\n\n----------------------');
     return taskId;
+  }
+
+  Future<void> updateTaskServername(int id, String servername) async {
+    Database _db = await database();
+    await _db.rawUpdate("UPDATE broker SET servername = '$servername' WHERE id = '$id'");
   }
 
   Future<void> updateTaskTitle(int id, String title) async {
@@ -74,6 +86,18 @@ class DatabaseHelper {
         .rawUpdate("UPDATE broker SET password = '$password' WHERE id = '$id'");
   }
 
+  Future<void> updateTaskWS(int id, int WS) async {
+    Database _db = await database();
+    await _db
+        .rawUpdate("UPDATE broker SET useWS = '$WS' WHERE id = '$id'");
+  }
+
+  Future<void> updateTaskSSL(int id, int SSL) async {
+    Database _db = await database();
+    await _db
+        .rawUpdate("UPDATE broker SET useSSL = '$SSL' WHERE id = '$id'");
+  }
+
   Future<void> deleteTask(int id) async {
     Database _db = await database();
     await _db.rawDelete("DELETE FROM broker WHERE id = '$id'");
@@ -93,11 +117,14 @@ class DatabaseHelper {
     return List.generate(taskMap.length, (index) {
       return Task(
         id: taskMap[index]['id'],
+        servername: taskMap[index]['servername'],
         title: taskMap[index]['title'],
         description: taskMap[index]['description'],
         clientid: taskMap[index]['clientid'],
         username: taskMap[index]['username'],
         password: taskMap[index]['password'],
+        useWS: taskMap[index]['useWS'],
+          useSSL: taskMap[index]['useSSL']
       );
     });
   }
@@ -146,7 +173,7 @@ class DatabaseHelper {
     await _db.rawUpdate("UPDATE devices SET sub = '$sub' WHERE id = '$id'");
   }
 
-  Future<void> updateDevicesqos(int id, String qos) async {
+  Future<void> updateDevicesqos(int id, int qos) async {
     Database _db = await database();
     await _db.rawUpdate("UPDATE devices SET qos = '$qos' WHERE id = '$id'");
   }
@@ -154,6 +181,41 @@ class DatabaseHelper {
   Future<void> updateDevicesretain(int id, String retain) async {
     Database _db = await database();
     await _db.rawUpdate("UPDATE devices SET qos = '$retain' WHERE id = '$id'");
+  }
+
+  Future<void> updateDevicesstyle(int id, String style) async {
+    Database _db = await database();
+    await _db.rawUpdate("UPDATE devices SET style = '$style' WHERE id = '$id'");
+  }
+
+  Future<void> updateDevicesText(int id, String saveTEXT) async {
+    Database _db = await database();
+    await _db.rawUpdate("UPDATE devices SET savetext = '$saveTEXT' WHERE id = '$id'");
+  }
+
+  Future<void> updateDevicesMin(int id, double min) async {
+    Database _db = await database();
+    await _db.rawUpdate("UPDATE devices SET min = '$min' WHERE id = '$id'");
+  }
+
+  Future<void> updateDevicesMax(int id, double max) async {
+    Database _db = await database();
+    await _db.rawUpdate("UPDATE devices SET max = '$max' WHERE id = '$id'");
+  }
+
+  Future<void> updateDevicessaveurl(int id, String saveweb) async {
+    Database _db = await database();
+    await _db.rawUpdate("UPDATE devices SET saveweb = '$saveweb' WHERE id = '$id'");
+  }
+
+  Future<void> updateDevicessaveradio(int id, String saveRadio) async {
+    Database _db = await database();
+    await _db.rawUpdate("UPDATE devices SET saveRadio = '$saveRadio' WHERE id = '$id'");
+  }
+
+  Future<void> updateDevicessavewebclick(int id, String savewebclick) async {
+    Database _db = await database();
+    await _db.rawUpdate("UPDATE devices SET savewebclick = '$savewebclick' WHERE id = '$id'");
   }
 
   Future<List<Devices>> getDevices() async {
@@ -165,7 +227,14 @@ class DatabaseHelper {
           title: deviceMap[index]['title'],
           qos: deviceMap[index]['qos'],
           retain: deviceMap[index]['retain'],
-          sub: deviceMap[index]['sub']);
+          sub: deviceMap[index]['sub'],
+          style: deviceMap[index]['style'],
+          savetext: deviceMap[index]['savetext'],
+          min: deviceMap[index]['min'],
+          max: deviceMap[index]['max'],
+          saveweb: deviceMap[index]['saveweb'],
+          saveRadio: deviceMap[index]['saveRadio'],
+          savewebclick: deviceMap[index]['savewebclick']);
     });
   }
 
@@ -173,6 +242,120 @@ class DatabaseHelper {
     Database _db = await database();
     await _db.rawDelete("DELETE FROM devices WHERE id = '$id'");
   }
+
+  //////////////////////////devices choice////////////////////////////
+
+  Future<int> insertDeviceschoice(Deviceschoice devices) async {
+    int deviceId = 0;
+    Database _db = await database();
+    await _db
+        .insert('devicechoice', devices.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace)
+        .then((value) {
+      deviceId = value;
+    });
+
+    print('-------------\n\n\n\n\n\n\n\n----------------------');
+    return deviceId;
+  }
+
+  Future<void> updateDevicePayload(int id, String payload) async {
+    Database _db = await database();
+    await _db.rawUpdate("UPDATE devicechoice SET payloads = '$payload' WHERE id = '$id'");
+  }
+
+  Future<void> updateDevicesLabel(int id, String label) async {
+    Database _db = await database();
+    await _db.rawUpdate("UPDATE devicechoice SET label = '$label' WHERE id = '$id'");
+  }
+
+  Future<List<Deviceschoice>> getDeviceschoice(int deviceid) async {
+    Database _db = await database();
+    List<Map<String, dynamic>> deviceMap = await _db.rawQuery("SELECT * FROM devicechoice WHERE deviceid = $deviceid");
+    return List.generate(deviceMap.length, (index) {
+      return Deviceschoice(
+          id: deviceMap[index]['id'],
+          deviceId: deviceMap[index]['deviceId'],
+          payloads: deviceMap[index]['payloads'],
+          label: deviceMap[index]['label']);
+    });
+  }
+
+  /*Future<List<Deviceschoice>> getDeviceschoice() async {
+    Database _db = await database();
+    List<Map<String, dynamic>> deviceMap = await _db.query("devicechoice");
+    return List.generate(deviceMap.length, (index) {
+      return Deviceschoice(
+          id: deviceMap[index]['id'],
+          deviceId: deviceMap[index]['deviceId'],
+          payloads: deviceMap[index]['payloads'],
+          label: deviceMap[index]['label']);
+    });
+  }*/
+
+  Future<void> delete_devicechoice(int id) async {
+    Database _db = await database();
+    await _db.rawDelete("DELETE FROM devicechoice WHERE id = '$id'");
+  }
+
+  //////////////////////////devices choice temp////////////////////////////
+
+  Future<int> insertDeviceschoiceTemp(DeviceschoiceTemp devices) async {
+    int deviceId = 0;
+    Database _db = await database();
+    await _db
+        .insert('devicechoicetemp', devices.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace)
+        .then((value) {
+      deviceId = value;
+    });
+
+    print('-------------\n\n\n\n\n\n\n\n----------------------');
+    return deviceId;
+  }
+
+  Future<void> updateDevicePayloadTemp(int id, String payload) async {
+    Database _db = await database();
+    await _db.rawUpdate("UPDATE devicechoicetemp SET payloads = '$payload' WHERE id = '$id'");
+  }
+
+  Future<void> updateDevicesLabelTemp(int id, String label) async {
+    Database _db = await database();
+    await _db.rawUpdate("UPDATE devicechoicetemp SET label = '$label' WHERE id = '$id'");
+  }
+
+  Future<List<DeviceschoiceTemp>> getDeviceschoiceTemp() async {
+    Database _db = await database();
+    List<Map<String, dynamic>> deviceMap = await _db.query("devicechoicetemp");
+    return List.generate(deviceMap.length, (index) {
+      return DeviceschoiceTemp(
+          id: deviceMap[index]['id'],
+          deviceId: deviceMap[index]['deviceId'],
+          payloads: deviceMap[index]['payloads'],
+          label: deviceMap[index]['label']);
+    });
+  }
+
+  Future<void> delete_devicechoiceTemp(int id) async {
+    Database _db = await database();
+    await _db.rawDelete("DELETE FROM devicechoicetemp WHERE id = '$id'");
+  }
+
+  Future<void> plaacedevice_devicechoice(int id) async {
+    Database _db = await database();
+    await _db.execute("UPDATE devicechoice SET deviceId = '$id' WHERE deviceId = 0");
+  }
+
+  /*Future<void> copy_devicechoiceTempAll() async {
+    Database _db = await database();
+    await _db.execute("INSERT INTO devicechoice SELECT * FROM devicechoicetemp");
+  }*/
+
+  Future<void> delete_devicechoiceTempAll() async {
+    Database _db = await database();
+    await _db.rawDelete("DELETE FROM devicechoicetemp");
+  }
+
 
 ///////////////////////////// rooms //////////////////////
 

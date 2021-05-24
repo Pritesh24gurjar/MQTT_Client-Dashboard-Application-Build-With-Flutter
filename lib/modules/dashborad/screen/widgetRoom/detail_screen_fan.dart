@@ -2,19 +2,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mqtt_app/models/models.dart';
 import 'package:mqtt_app/models/select_model.dart';
-// import 'package:mqtt_app/widgets/custom_slider.dart';
+
 import 'package:mqtt_app/widgets/lighting_card.dart';
 import 'package:mqtt_app/widgets/widgets.dart';
 import 'package:neuomorphic_container/neuomorphic_container.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
-// import 'package:smart_home/models/models.dart';
-// import 'package:smart_home/models/select_model.dart';
-// import 'package:smart_home/widgets/select_container.dart';
-// import 'package:smart_home/widgets/widgets.dart';
 
 class DetailScreen_fan extends StatefulWidget {
   final String title;
-  DetailScreen_fan({@required this.title});
+  final room;
+  DetailScreen_fan({@required this.title, @required this.room});
 
   @override
   _DetailScreenState createState() => _DetailScreenState();
@@ -86,6 +83,7 @@ class _DetailScreenState extends State<DetailScreen_fan> {
                   return SelectContainer(
                     icon: _listSelect[index].icon,
                     name: _listSelect[index].name,
+                    room: widget.room,
                   );
                 },
               ),
@@ -129,23 +127,7 @@ class _DetailScreenState extends State<DetailScreen_fan> {
                 ),
               ),
             ),
-            // Container(
-            //   height: _height * 0.3,
-            //   child: ListView.builder(
-            //     scrollDirection: Axis.horizontal,
-            //     itemCount: _listLighting.length,
-            //     itemBuilder: (context, index) {
-            //       return Padding(
-            //         padding:
-            //             const EdgeInsets.only(right: 8.0, top: 16, bottom: 16),
-            //         child: LightingCard(
-            //           title: _listLighting[index].name,
-            //           image: _listLighting[index].image,
-            //         ),
-            //       );
-            //     },
-            //   ),
-            // ),
+
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: textCate(nameCate: 'Turn On/Off'),

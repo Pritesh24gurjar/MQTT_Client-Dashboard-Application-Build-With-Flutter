@@ -3,13 +3,11 @@ import 'package:flutter/material.dart';
 class CateContainer extends StatelessWidget {
   final String image;
   final String name;
-  final String temp;
   final Function onTap;
 
   CateContainer({
     @required this.image,
     @required this.name,
-    @required this.temp,
     @required this.onTap,
   });
 

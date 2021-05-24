@@ -1,26 +1,25 @@
-// import 'package:flashlight/flashlight.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:mqtt_app/modules/core/managers/MQTTManager.dart';
-import 'package:mqtt_app/modules/helpers/screen_route.dart';
-// import 'package:mqtt_app/modules/core/models/MQTTAppState.dart';
-// import 'package:mqtt_app/modules/core/widgets/status_bar.dart';
-// import 'package:mqtt_app/modules/helpers/screen_route.dart';
-// import 'package:mqtt_app/modules/helpers/status_info_message_utils.dart';
 import 'package:provider/provider.dart';
-// import 'package:mqtt_app/modules/message/screen/message_screen.dart';
-// import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_hsvcolor_picker/flutter_hsvcolor_picker.dart';
 
-class FlashLight extends StatefulWidget {
+enum SingingCharacter { lafayette, jefferson }
+
+class lightinside extends StatefulWidget {
+  final String title;
+  final String pub;
+  final int qos;
+  lightinside({this.title, this.pub, this.qos});
+
   @override
   State<StatefulWidget> createState() {
-    return _FlashLight();
+    return _lightinside();
   }
 }
 
-class _FlashLight extends State<FlashLight> {
+class _lightinside extends State<lightinside> {
+  SingingCharacter _character = SingingCharacter.lafayette;
   List<Color> currentColors = [Colors.limeAccent, Colors.green];
   final TextEditingController _messageTextController = TextEditingController();
   final TextEditingController _topicTextController = TextEditingController();
@@ -32,13 +31,21 @@ class _FlashLight extends State<FlashLight> {
   // bool _saveNeeded = false;
   // int _qosValue = 0;
   // String _messageContent;
-  String _topicContent = 'temp/con';
+  //String _topicContent = 'temp/con';
   MQTTManager _manager;
-
+  bool _keypadShown = false;
   bool hasflashlight = true; //to set is there any flashlight ?
   bool isturnon = false; //to set if flash light is on or off
   IconData flashicon = Icons.flash_off; //icon for lashlight button
   Color flashbtncolor = Colors.deepOrangeAccent; //color for flash button
+  var test;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+
   @override
   void dispose() {
     _messageTextController.dispose();
@@ -66,7 +73,7 @@ class _FlashLight extends State<FlashLight> {
     _manager = Provider.of<MQTTManager>(context);
     var _dialVisible = true;
     return Scaffold(
-      appBar: AppBar(title: Text("Flash Light")),
+      appBar: AppBar(title: Text(widget.title)),
       body: Container(
         width: double.infinity,
         height: MediaQuery.of(context).size.height,
@@ -74,53 +81,6 @@ class _FlashLight extends State<FlashLight> {
         padding: EdgeInsets.all(40),
         //set width and height of outermost wrapper to 100%;
         child: flashlightbutton(),
-      ),
-      floatingActionButton: SpeedDial(
-        // both default to 16
-        marginRight: 18,
-        marginBottom: 20,
-        animatedIcon: AnimatedIcons.menu_close,
-        animatedIconTheme: IconThemeData(size: 22.0),
-        // this is ignored if animatedIcon is non null
-        // child: Icon(Icons.add),
-        visible: _dialVisible = true,
-        // If true user is forced to close dial manually
-        // by tapping main button and overlay is not rendered.
-        closeManually: false,
-        curve: Curves.bounceIn,
-        overlayColor: Colors.black,
-        overlayOpacity: 0.5,
-        onOpen: () => print('OPENING DIAL'),
-        onClose: () => print('DIAL CLOSED'),
-        tooltip: 'Speed Dial',
-        heroTag: 'speed-dial-hero-tag',
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 8.0,
-        shape: CircleBorder(),
-        children: [
-          SpeedDialChild(
-            child: Icon(Icons.accessibility),
-            backgroundColor: Colors.red,
-            label: 'Subscribe',
-            labelStyle: TextStyle(fontSize: 18.0),
-            onTap: () => Navigator.of(context).pushNamed(SUBSCRIBE_ROUTE),
-          ),
-          SpeedDialChild(
-            child: Icon(Icons.flash_auto),
-            backgroundColor: Colors.blue,
-            label: 'Light on/off',
-            labelStyle: TextStyle(fontSize: 18.0),
-            onTap: () => Navigator.of(context).pushNamed(LIGHT_ROUTE),
-          ),
-          SpeedDialChild(
-            child: Icon(Icons.message_rounded),
-            backgroundColor: Colors.green,
-            label: 'Advanced Text',
-            labelStyle: TextStyle(fontSize: 18.0),
-            onTap: () => Navigator.of(context).pushNamed(MESS_ROUTE),
-          ),
-        ],
       ),
     );
   }
@@ -161,8 +121,9 @@ class _FlashLight extends State<FlashLight> {
                       hex[6] +
                       hex[7] +
                       hex[8];
-                  _manager.publishColor(
-                      hex.toString(), 1, _topicContent, _retainValue);
+                  /*_manager.publishColor(
+                      hex.toString(), widget.qos, widget.pub, _retainValue);*/
+                  test = hex;
                 },
               ),
             ),
@@ -170,32 +131,55 @@ class _FlashLight extends State<FlashLight> {
             // Text(isturnon ? "Flash is ON" : 'Flash is OFF'),
             const SizedBox(height: 40),
             // const SizedBox(height: 10),
-            Container(
-              child: FlatButton.icon(
-                onPressed: () {
-                  // _manager.publish('on', 1, _topicContent, _retainValue);
-                  if (isturnon) {
-                    //if light is on, then turn off
-                    // Flashlight.lightOff();
+            ListTile(
+              title: const Text('HEX'),
+              leading: Radio<SingingCharacter>(
+              value: SingingCharacter.lafayette,
+              groupValue: _character,
+              onChanged: (SingingCharacter value) {
+              setState(() {
+              _character = value;
+                      });
+                   },
+              ),
+            ),
+            ListTile(
+              title: const Text('Number String'),
+              leading: Radio<SingingCharacter>(
+              value: SingingCharacter.jefferson,
+              groupValue: _character,
+              onChanged: (SingingCharacter value) {
+              setState(() {
+                 _character = value;
+                      });
+                    },
+              )
+            ),
 
-                    setState(() {
-                      _manager.publish('off', 1, _topicContent, _retainValue);
-                      isturnon = false;
-                      flashicon = Icons.flash_off;
-                      flashbtncolor = Colors.deepOrangeAccent;
-                    });
-                  } else {
-                    //if light is off, then turn on.
-                    // Flashlight.lightOn();
-                    _manager.publish('on', 1, _topicContent, _retainValue);
-                    setState(() {
-                      isturnon = true;
-                      flashicon = Icons.flash_on;
-                      flashbtncolor = Colors.greenAccent;
-                    });
-                  }
+            const SizedBox(height: 40),
+            Container(
+              child: RaisedButton(
+                elevation: 5.0,
+                onPressed: () async {
+                  _manager.publishColor(test.toString(), widget.qos, widget.pub, _retainValue);
                 },
-                icon: Icon(
+                padding: EdgeInsets.all(10.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                ),
+                color: Colors.white,
+                child: Text(
+                  'Save',
+                  style: TextStyle(
+                    color: Color(0xFF527DAA),
+                    letterSpacing: 1.5,
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'OpenSans',
+                  ),
+                ),
+              ),
+                /*icon: Icon(
                   flashicon,
                   color: Colors.white,
                 ),
@@ -203,9 +187,8 @@ class _FlashLight extends State<FlashLight> {
                 label: Text(
                   isturnon ? 'TURN OFF' : 'TURN ON',
                   style: TextStyle(color: Colors.white),
-                ),
+                ),*/
               ),
-            ),
           ],
         ),
       );
@@ -213,4 +196,66 @@ class _FlashLight extends State<FlashLight> {
       return Text("Your device do not have flash light.");
     }
   }
+
+  /*Widget _buildHEXCheck() {
+    return Container(
+      height: 20.0,
+      child: Row(
+        children: <Widget>[
+          Theme(
+            data: ThemeData(unselectedWidgetColor: Colors.white),
+            child: Checkbox(
+              value: _ws,
+              checkColor: Colors.green,
+              activeColor: Colors.white,
+              onChanged: (value) {
+                setState(() {
+                  _ws = value;
+                  if(value == true)
+                    _wsint = 1;
+                  else
+                    _wsint = 0;
+                });
+              },
+            ),
+          ),
+          Text(
+            'Ws/Wss',
+            style: kLabelStyle,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNumericCheck() {
+    return Container(
+      height: 20.0,
+      child: Row(
+        children: <Widget>[
+          Theme(
+            data: ThemeData(unselectedWidgetColor: Colors.white),
+            child: Checkbox(
+              value: _ssl,
+              checkColor: Colors.green,
+              activeColor: Colors.white,
+              onChanged: (value) {
+                setState(() {
+                  _ssl = value;
+                  if(value == true)
+                    _sslint = 1;
+                  else
+                    _sslint = 0;
+                });
+              },
+            ),
+          ),
+          Text(
+            'TLS/SSL',
+            style: kLabelStyle,
+          ),
+        ],
+      ),
+    );
+  }*/
 }

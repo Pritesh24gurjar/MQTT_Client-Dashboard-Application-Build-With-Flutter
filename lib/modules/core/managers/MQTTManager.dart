@@ -8,8 +8,6 @@ import 'dart:io';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:flutter/material.dart';
-// import 'package:mqtt_client/mqtt_client.dart';
-// import 'package:mqtt_client/mqtt_server_client.dart';
 import '../models/MQTTAppState.dart';
 // import 'package:event_bus/event_bus.dart';
 import 'package:mqtt_app/modules/core/managers/eventbus.dart';
@@ -19,6 +17,8 @@ class MQTTManager extends ChangeNotifier {
   var events;
   MQTTAppState _currentState = MQTTAppState();
   MqttServerClient _client;
+  MqttServerClient _clientWS;
+  MqttServerClient _clientSSL;
   String _identifier;
   String _host;
   String _topic = "";
@@ -33,14 +33,14 @@ class MQTTManager extends ChangeNotifier {
   bool Function(X509Certificate certificate) onBadCertificate;
 
   /// If set use a websocket connection, otherwise use the default TCP one
-  bool useWebSocket = false;
+  //bool useWebSocket = false;
 
   /// If set use the alternate websocket implementation
-  bool useAlternateWebSocketImplementation = false;
+  //bool useAlternateWebSocketImplementation = false;
 
   /// If set use a secure connection, note TCP only, do not use for
   /// secure websockets(wss).
-  bool secure = true;
+  //bool secure = false;
 
   /// Max connection attempts
   final int maxConnectionAttempts = 3;
@@ -51,7 +51,6 @@ class MQTTManager extends ChangeNotifier {
     @required String port,
     @required String username,
     @required String password,
-    // @required bool useWS,
   }) {
     _identifier = identifier;
     _host = host;
@@ -65,7 +64,7 @@ class MQTTManager extends ChangeNotifier {
     _client.onDisconnected = onDisconnected;
     _client.secure = false;
     _client.logging(on: true);
-    // _client.useWebSocket = false;
+    _client.useWebSocket = false;
 
     /// Add the successful connection callback
     _client.onConnected = onConnected;
@@ -75,10 +74,10 @@ class MQTTManager extends ChangeNotifier {
     final MqttConnectMessage connMess = MqttConnectMessage()
         .withClientIdentifier(_identifier)
         .withWillTopic(
-            'willtopic') // If you set this you must set a will message
+        'willtopic') // If you set this you must set a will message
         .withWillMessage('My Will message')
         .startClean() // Non persistent session for testing
-        //.authenticateAs(username, password)// Non persistent session for testing
+    //.authenticateAs(username, password)// Non persistent session for testing
         .withWillQos(MqttQos.atLeastOnce);
     print('EXAMPLE::Mosquitto client connecting....');
     _client.connectionMessage = connMess;
@@ -99,29 +98,38 @@ class MQTTManager extends ChangeNotifier {
     _password = password;
     // _useWS = useWS;
 
-    _client = MqttServerClient(_host, _identifier);
-    _client.port = int.parse(_port);
-    _client.keepAlivePeriod = 20;
-    _client.onDisconnected = onDisconnected;
-    _client.secure = false;
-    _client.logging(on: true);
-    // _client.useWebSocket = false;
+    _clientSSL = MqttServerClient(_host, _identifier);
+    _clientSSL.port = int.parse(_port);
+    _clientSSL.keepAlivePeriod = 20;
+    _clientSSL.onDisconnected = onDisconnected;
+    _clientSSL.secure = true;
+    _clientSSL.logging(on: true);
+    _clientSSL.useWebSocket = false;
+
+    //AsymmetricKeyPair keyPair = rsaGenerateKeyPair();
+    /*securityContext.useCertificateChain('path/to/my_cert.pem');
+    securityContext.usePrivateKey('path/to/my_key.pem', password: '336600');
+    securityContext.setClientAuthorities('path/to/client.crt', password: '336600');*/
+
+    _clientSSL.useAlternateWebSocketImplementation = false;
+    _clientSSL.securityContext = securityContext;
+    _clientSSL.onBadCertificate = onBadCertificate;
 
     /// Add the successful connection callback
-    _client.onConnected = onConnected;
-    _client.onSubscribed = onSubscribed;
-    _client.onUnsubscribed = onUnsubscribed;
+    _clientSSL.onConnected = onConnected;
+    _clientSSL.onSubscribed = onSubscribed;
+    _clientSSL.onUnsubscribed = onUnsubscribed;
 
     final MqttConnectMessage connMess = MqttConnectMessage()
         .withClientIdentifier(_identifier)
         .withWillTopic(
-            'willtopic') // If you set this you must set a will message
+        'willtopic') // If you set this you must set a will message
         .withWillMessage('My Will message')
         .startClean() // Non persistent session for testing
-        //.authenticateAs(username, password)// Non persistent session for testing
+    //.authenticateAs(username, password)// Non persistent session for testing
         .withWillQos(MqttQos.atLeastOnce);
     print('EXAMPLE::Mosquitto client connecting....');
-    _client.connectionMessage = connMess;
+    _clientSSL.connectionMessage = connMess;
   }
 
   void initializeMQTTClientWS({
@@ -139,29 +147,31 @@ class MQTTManager extends ChangeNotifier {
     _password = password;
     _useWS = useWS;
     _hostWS = 'ws://' + _host + ':' + _port + '/mqtt';
-    _client = MqttServerClient(_hostWS, _identifier);
-    _client.port = int.parse(_port);
-    _client.keepAlivePeriod = 20;
-    _client.onDisconnected = onDisconnected;
-    _client.secure = false;
-    _client.logging(on: true);
-    _client.useWebSocket = true;
+    _clientWS = MqttServerClient(_hostWS, _identifier);
+    _clientWS.port = int.parse(_port);
+    _clientWS.keepAlivePeriod = 20;
+    _clientWS.onDisconnected = onDisconnected;
+    _clientWS.secure = false;
+    _clientWS.logging(on: true);
+    //_clientWS.useWebSocket = true;
+    _clientWS.useAlternateWebSocketImplementation = true;
+
 
     /// Add the successful connection callback
-    _client.onConnected = onConnected;
-    _client.onSubscribed = onSubscribed;
-    _client.onUnsubscribed = onUnsubscribed;
+    _clientWS.onConnected = onConnected;
+    _clientWS.onSubscribed = onSubscribed;
+    _clientWS.onUnsubscribed = onUnsubscribed;
 
     final MqttConnectMessage connMess = MqttConnectMessage()
         .withClientIdentifier(_identifier)
         .withWillTopic(
-            'willtopic') // If you set this you must set a will message
+        'willtopic') // If you set this you must set a will message
         .withWillMessage('My Will message')
         .startClean() // Non persistent session for testing
-        //.authenticateAs(username, password)// Non persistent session for testing
+    //.authenticateAs(username, password)// Non persistent session for testing
         .withWillQos(MqttQos.atLeastOnce);
     print('EXAMPLE::Mosquitto client connecting....');
-    _client.connectionMessage = connMess;
+    _clientWS.connectionMessage = connMess;
   }
 
   String get host => _host;
@@ -175,13 +185,14 @@ class MQTTManager extends ChangeNotifier {
     //   maxConnectionAttempts: maxConnectionAttempts,
     // );
 
-    if (secure) {
+    /*if (_client.secure == secure) {
+      print('Hello world');
       _client.secure = true;
       _client.useWebSocket = false;
       _client.useAlternateWebSocketImplementation = false;
       _client.securityContext = securityContext;
       _client.onBadCertificate = onBadCertificate;
-    }
+    }*/
     assert(_client != null);
     try {
       print('EXAMPLE::Mosquitto start client connecting....');
@@ -195,7 +206,7 @@ class MQTTManager extends ChangeNotifier {
     }
   }
 
-  void connect1() async {
+  void connect_WUP() async {
     assert(_client != null);
     try {
       print('EXAMPLE::Mosquitto start client connecting....');
@@ -208,9 +219,92 @@ class MQTTManager extends ChangeNotifier {
     }
   }
 
+  void connect_Websocket() async {
+    assert(_clientWS != null);
+    try {
+      print('EXAMPLE::Mosquitto start client connecting....');
+      _currentState.setAppConnectionState(MQTTAppConnectionState.connecting);
+      updateState();
+      await _clientWS.connect(_username, _password);
+      print('COnnect to wssssssssssss\n\n\n\n\n----------');
+    } on Exception catch (e) {
+      print('EXAMPLE::client exception - $e');
+      disconnect();
+    }
+  }
+
+  void connect_Websocket_WUP() async {
+    assert(_clientWS != null);
+    try {
+      print('EXAMPLE::Mosquitto start client connecting....');
+      _currentState.setAppConnectionState(MQTTAppConnectionState.connecting);
+      updateState();
+      await _clientWS.connect();
+      print('COnnect to wssssssssssss with user and pass\n\n\n\n\n----------');
+    } on Exception catch (e) {
+      print('EXAMPLE::client exception - $e');
+      disconnect();
+    }
+  }
+
+  void connect_SSL() async {
+    assert(_clientSSL != null);
+    //assert(await addSelfSignedCertificate());
+    //eventBus.fire(eventBus);
+    try {
+      print('EXAMPLE::Mosquitto start client connecting....');
+      _currentState.setAppConnectionState(MQTTAppConnectionState.connecting);
+      updateState();
+      await _clientSSL.connect(_username, _password);
+      print('COnnect to ssssssssssslllllll\n\n\n\n\n----------');
+    } on Exception catch (e) {
+      print('EXAMPLE::client exception - $e');
+      disconnect();
+    }
+  }
+
+  void connect_SSL_WUP() async {
+    assert(_clientSSL != null);
+    //assert(await addSelfSignedCertificate());
+    //eventBus.fire(eventBus);
+    try {
+      print('EXAMPLE::Mosquitto start client connecting....');
+      _currentState.setAppConnectionState(MQTTAppConnectionState.connecting);
+      updateState();
+      await _clientSSL.connect();
+      print('COnnect to ssssssssssslllllll\n\n\n\n\n----------');
+    } on Exception catch (e) {
+      print('EXAMPLE::client exception - $e');
+      disconnect();
+    }
+  }
+
   void disconnect() {
-    print('Disconnected');
-    _client.disconnect();
+    if(_client != null && _clientSSL == null && _clientWS == null)
+    {
+      print('Disconnected from if else');
+      _client.disconnect();
+      _client = null;
+    }
+    else if(_clientSSL != null && _client == null && _clientWS == null)
+    {
+      print('Disconnected from if else ssl');
+      _clientSSL.disconnect();
+      _clientSSL = null;
+    }
+    else if(_clientWS != null && _client == null && _clientSSL == null)
+    {
+      print('Disconnected from if else WS');
+      _clientWS.disconnect();
+      _clientWS = null;
+    }
+    else
+    {
+      print('error');
+    }
+    //_client.disconnect();
+    //_clientWS.disconnect();
+    //_clientSSL.disconnect();
   }
 
   // void publish(String message) {
@@ -225,8 +319,34 @@ class MQTTManager extends ChangeNotifier {
     if (topic.isEmpty) {
       topic = _topic;
     }
-    _client.publishMessage(topic, MqttQos.values[_qos], builder.payload,
+    if(_client != null && _clientSSL == null && _clientWS == null)
+    {
+      print('From nomal port');
+      _client.publishMessage(topic, MqttQos.values[_qos], builder.payload,
+          retain: retain);
+    }
+    else if(_clientSSL != null && _client == null && _clientWS == null)
+    {
+      print('From SSL port');
+      _clientSSL.publishMessage(topic, MqttQos.values[_qos], builder.payload,
+          retain: retain);
+    }
+    else if(_clientWS != null && _client == null && _clientSSL == null)
+    {
+      print('From Socket port');
+      _clientWS.publishMessage(topic, MqttQos.values[_qos], builder.payload,
+          retain: retain);
+    }
+    else
+    {
+      print('error or no coneection');
+    }
+    /*_client.publishMessage(topic, MqttQos.values[_qos], builder.payload,
         retain: retain);
+    _clientSSL.publishMessage(topic, MqttQos.values[_qos], builder.payload,
+        retain: retain);
+    _clientWS.publishMessage(topic, MqttQos.values[_qos], builder.payload,
+        retain: retain);*/
     // _currentState.setReceivedText(message);
     // _currentState.setReceivedOnlyText(message);
   }
@@ -237,8 +357,34 @@ class MQTTManager extends ChangeNotifier {
     if (topic.isEmpty) {
       topic = _topic;
     }
-    _client.publishMessage(topic, MqttQos.values[_qos], builder.payload,
+    if(_client != null && _clientSSL == null && _clientWS == null)
+    {
+      print('From nomal port');
+      _client.publishMessage(topic, MqttQos.values[_qos], builder.payload,
+          retain: retain);
+    }
+    else if(_clientSSL != null && _client == null && _clientWS == null)
+    {
+      print('From SSL port');
+      _clientSSL.publishMessage(topic, MqttQos.values[_qos], builder.payload,
+          retain: retain);
+    }
+    else if(_clientWS != null && _client == null && _clientSSL == null)
+    {
+      print('From Socket port');
+      _clientWS.publishMessage(topic, MqttQos.values[_qos], builder.payload,
+          retain: retain);
+    }
+    else
+    {
+      print('error');
+    }
+    /*_client.publishMessage(topic, MqttQos.values[_qos], builder.payload,
         retain: retain);
+    _clientSSL.publishMessage(topic, MqttQos.values[_qos], builder.payload,
+        retain: retain);
+    _clientWS.publishMessage(topic, MqttQos.values[_qos], builder.payload,
+        retain: retain);*/
     // _currentState.setReceivedText(message);
     // _currentState.setReceivedOnlyText(message);
     // _currentState.setReceivedOnlyColor(message);
@@ -263,10 +409,42 @@ class MQTTManager extends ChangeNotifier {
   /// The unsolicited disconnect callback
   void onDisconnected() {
     print('EXAMPLE::OnDisconnected client callback - Client disconnection');
-    if (_client.connectionStatus.returnCode ==
+    /*if (_client.connectionStatus.returnCode ==
         MqttConnectReturnCode.noneSpecified) {
-      print('EXAMPLE::OnDisconnected callback is solicited, this is correct');
+      print('EXAMPLE::OnDisconnected on normal callback is solicited, this is correct');
     }
+    else if (_clientSSL.connectionStatus.returnCode ==
+        MqttConnectReturnCode.noneSpecified) {
+      print('EXAMPLE::OnDisconnected on SSL callback is solicited, this is correct');
+    }
+    else if (_clientWS.connectionStatus.returnCode ==
+        MqttConnectReturnCode.noneSpecified) {
+      print('EXAMPLE::OnDisconnected on WS callback is solicited, this is correct');
+    }*/
+    if(_client != null && _clientSSL == null && _clientWS == null) {
+      if (_client.connectionStatus.returnCode ==
+          MqttConnectReturnCode.noneSpecified) {
+        print(
+            'EXAMPLE::OnDisconnected on normal callback is solicited, this is correct');
+      }
+    }
+
+    else if(_clientSSL != null && _client == null && _clientWS == null) {
+      if (_clientSSL.connectionStatus.returnCode ==
+          MqttConnectReturnCode.noneSpecified) {
+        print(
+            'EXAMPLE::OnDisconnected on SSL callback is solicited, this is correct');
+      }
+    }
+
+    else if(_clientWS != null && _client == null && _clientSSL == null) {
+      if (_clientWS.connectionStatus.returnCode ==
+          MqttConnectReturnCode.noneSpecified) {
+        print(
+            'EXAMPLE::OnDisconnected on WS callback is solicited, this is correct');
+      }
+    }
+
     _currentState.clearText();
     _currentState.setAppConnectionState(MQTTAppConnectionState.disconnected);
     updateState();
@@ -291,33 +469,117 @@ class MQTTManager extends ChangeNotifier {
         'EXAMPLE::OnConnected client callback - Client connection was sucessful');
   }
 
-  String subScribeTo(String topic) {
+  void subScribeTo(String topic) {
     // Save topic for future use
     _topic = topic;
-    var _message_recv;
-    _client.subscribe(topic, MqttQos.atLeastOnce);
+    /*_client.subscribe(topic, MqttQos.atLeastOnce);
     _client.updates.listen((List<MqttReceivedMessage<MqttMessage>> c) {
       final MqttPublishMessage recMess = c[0].payload;
       final String pt =
           MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
-      _message_recv = pt;
       _currentState.setReceivedText(pt);
       updateState();
       print(
           'EXAMPLE::Change notification:: topic is <${c[0].topic}>, payload is <-- $pt -->');
       print('');
-    });
-    return _message_recv;
+    });*/
+    if(_client != null && _clientSSL == null && _clientWS == null) {
+      _client.subscribe(topic, MqttQos.atLeastOnce);
+      _client.updates.listen((List<MqttReceivedMessage<MqttMessage>> c) {
+        final MqttPublishMessage recMess = c[0].payload;
+        final String pt =
+        MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
+        _currentState.setReceivedText(pt);
+        updateState();
+        print(
+            'EXAMPLE::Change notification:: topic is <${c[0].topic}>, payload is <-- $pt -->');
+        print('');
+      });
+    }
+
+    else if(_clientSSL != null && _client == null && _clientWS == null) {
+      _clientSSL.subscribe(topic, MqttQos.atLeastOnce);
+      _clientSSL.updates.listen((List<MqttReceivedMessage<MqttMessage>> c) {
+        final MqttPublishMessage recMess = c[0].payload;
+        final String pt =
+        MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
+        _currentState.setReceivedText(pt);
+        updateState();
+        print(
+            'EXAMPLE::Change notification:: topic is <${c[0].topic}>, payload is <-- $pt -->');
+        print('');
+      });
+    }
+
+    else if(_clientWS != null && _client == null && _clientSSL == null) {
+      _clientWS.subscribe(topic, MqttQos.atLeastOnce);
+      _clientWS.updates.listen((List<MqttReceivedMessage<MqttMessage>> c) {
+        final MqttPublishMessage recMess = c[0].payload;
+        final String pt =
+        MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
+        _currentState.setReceivedText(pt);
+        updateState();
+        print(
+            'EXAMPLE::Change notification:: topic is <${c[0].topic}>, payload is <-- $pt -->');
+        print('');
+      });
+    }
+    else
+    {
+      print('error');
+    }
   }
 
   /// Unsubscribe from a topic
   void unSubscribe(String topic) {
-    _client.unsubscribe(topic);
+    //_client.unsubscribe(topic);
+    //_clientWS.unsubscribe(topic);
+    // _clientSSL.unsubscribe(topic);
+    if(_client != null && _clientSSL == null && _clientWS == null)
+    {
+      print('port nomal');
+      _client.unsubscribe(topic);
+    }
+    else if(_clientSSL != null && _client == null && _clientWS == null)
+    {
+      print('port SSL');
+      _clientSSL.unsubscribe(topic);
+    }
+    else if(_clientWS != null && _client == null && _clientSSL == null)
+    {
+      print('port WS');
+      _clientWS.unsubscribe(topic);
+    }
+    else
+    {
+      print('error');
+    }
   }
 
   /// Unsubscribe from a topic
   void unSubscribeFromCurrentTopic() {
-    _client.unsubscribe(_topic);
+    //_client.unsubscribe(_topic);
+    //_clientWS.unsubscribe(_topic);
+    //_clientSSL.unsubscribe(_topic);
+    if(_client != null && _clientSSL == null && _clientWS == null)
+    {
+      print('port nomal');
+      _client.unsubscribe(_topic);
+    }
+    else if(_clientSSL != null && _client == null && _clientWS == null)
+    {
+      print('port SSL');
+      _clientSSL.unsubscribe(_topic);
+    }
+    else if(_clientWS != null && _client == null && _clientSSL == null)
+    {
+      print('port WS');
+      _clientWS.unsubscribe(_topic);
+    }
+    else
+    {
+      print('error');
+    }
   }
 
   void updateState() {

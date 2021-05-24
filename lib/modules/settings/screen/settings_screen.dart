@@ -8,7 +8,7 @@ import 'package:mqtt_app/modules/core/managers/MQTTManager.dart';
 import 'package:mqtt_app/modules/core/models/MQTTAppState.dart';
 import 'package:mqtt_app/modules/core/widgets/status_bar.dart';
 import 'package:mqtt_app/modules/helpers/status_info_message_utils.dart';
-import 'package:mqtt_app/modules/message/screen/message_screen.dart';
+import 'package:mqtt_app/modules/broker/screen/broker_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:ssl_pinning_plugin/ssl_pinning_plugin.dart';
 
@@ -272,7 +272,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
     if (_passwordTextController.text.isEmpty == true &&
         _usernameTextController.text.isEmpty == true) {
-      _manager.connect1();
+      _manager.connect_WUP();
     } else if (isTLS == false &&
         isWS == true &&
         _passwordTextController.text.isEmpty == false &&
@@ -284,7 +284,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           password: _passwordTextController.text,
           username: _usernameTextController.text,
           useWS: true);
-      _manager.connect1();
+      _manager.connect_WUP();
     } else {
       _manager.connect();
     }

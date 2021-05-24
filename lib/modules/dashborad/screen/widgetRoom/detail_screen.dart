@@ -4,21 +4,18 @@ import 'package:mqtt_app/helpers/database_helper.dart';
 import 'package:mqtt_app/models/models.dart';
 import 'package:mqtt_app/models/select_model.dart';
 import 'package:mqtt_app/modules/dashborad/screen/dashborad.dart';
-import 'package:mqtt_app/modules/dashborad/screen/roomdevice_slider%20form.dart';
-import 'package:mqtt_app/modules/dashborad/screen/roomdivform.dart';
+import 'package:mqtt_app/modules/dashborad/screen/updatePage/roomdevice_slider%20form.dart';
+import 'package:mqtt_app/modules/dashborad/screen/updatePage/roomdivform.dart';
 import 'package:mqtt_app/modules/dashborad/screen/roomdivset.dart';
 import 'package:mqtt_app/widgets/cutom_dialog_roomdiv.dart';
-// import 'package:mqtt_app/widgets/custom_slider.dart';
+
 import 'package:mqtt_app/widgets/lighting_card.dart';
 import 'package:mqtt_app/widgets/widgets.dart';
-// import 'package:smart_home/models/models.dart';
-// import 'package:smart_home/models/select_model.dart';
-// import 'package:smart_home/widgets/select_container.dart';
-// import 'package:smart_home/widgets/widgets.dart';
 
 class DetailScreen extends StatefulWidget {
   final room;
-  DetailScreen({@required this.room});
+  final title;
+  DetailScreen({@required this.room, this.title});
 
   @override
   _DetailScreenState createState() => _DetailScreenState();
@@ -122,6 +119,7 @@ class _DetailScreenState extends State<DetailScreen> {
                   return SelectContainer(
                     icon: _listSelect[index].icon,
                     name: _listSelect[index].name,
+                    room: widget.room,
                   );
                 },
               ),

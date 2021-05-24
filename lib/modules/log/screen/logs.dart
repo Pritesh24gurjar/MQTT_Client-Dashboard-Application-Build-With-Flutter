@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:mqtt_app/modules/core/managers/MQTTManager.dart';
 import 'package:mqtt_app/modules/core/models/MQTTAppState.dart';
 import 'package:mqtt_app/modules/core/widgets/status_bar.dart';
-import 'package:mqtt_app/modules/message/screen/message_screen.dart';
-import 'package:mqtt_app/modules/helpers/screen_route.dart';
+import 'package:mqtt_app/modules/broker/screen/broker_screen.dart';
+
 import 'package:mqtt_app/modules/helpers/status_info_message_utils.dart';
 
 import 'package:provider/provider.dart';
@@ -101,94 +101,3 @@ class _Logs extends State<Logs> {
   }
 }
 
-// class AppDrawer extends StatefulWidget {
-//   @override
-//   _AppDrawerState createState() => _AppDrawerState();
-// }
-
-// class _AppDrawerState extends State<AppDrawer> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return new Drawer(
-//         child: new ListView(
-//           children: <Widget>[
-//             new DrawerHeader(
-//               child: Text(
-//                 "MQTT APP",
-//                 style: TextStyle(
-//                   color: Colors.white,
-//                   fontSize: 24,
-//                 ),
-//               ),
-//               decoration: BoxDecoration(
-//                 color: Colors.blueAccent,
-//               ),
-//             ),
-//             new ListTile(
-//               leading: Icon(
-//                 Icons.account_circle,
-//                 color: Colors.blueAccent,
-//               ),
-//               title: Text(
-//                 "Dashborad",
-//                 style: TextStyle(
-//                   color: Colors.blueAccent,
-//                   fontSize: 16,
-//                 ),
-//               ),
-//               onTap: () {
-//                 Navigator.of(context).pushNamed(DASHBORAD_ROUTE);
-//               },
-//             ),
-//             new ListTile(
-//               leading: Icon(
-//                 Icons.cloud_download,
-//                 color: Colors.blueAccent,
-//               ),
-//               title: Text(
-//                 "Main",
-//                 style: TextStyle(
-//                   color: Colors.blueAccent,
-//                   fontSize: 16,
-//                 ),
-//               ),
-//               onTap: () {
-//                 Navigator.of(context).pushNamed('/');
-//               },
-//             ),
-//             new ListTile(
-//               leading: Icon(
-//                 Icons.message_outlined,
-//                 color: Colors.blueAccent,
-//               ),
-//               title: Text(
-//                 "Message",
-//                 style: TextStyle(
-//                   color: Colors.blueAccent,
-//                   fontSize: 16,
-//                 ),
-//               ),
-//               onTap: () {
-//                 Navigator.of(context).pushNamed(MESS_ROUTE);
-//               },
-//             ),
-//             new ListTile(
-//               leading: Icon(
-//                 Icons.lightbulb,
-//                 color: Colors.blueAccent,
-//               ),
-//               title: Text(
-//                 "light on/off",
-//                 style: TextStyle(
-//                   color: Colors.blueAccent,
-//                   fontSize: 16,
-//                 ),
-//               ),
-//               onTap: () {
-//                 Navigator.of(context).pushNamed(LIGHT_ROUTE);
-//               },
-//             ),
-//           ],
-//         ));
-//   }
-// }

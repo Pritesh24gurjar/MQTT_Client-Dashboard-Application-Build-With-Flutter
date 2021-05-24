@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:mqtt_app/homepage.dart';
-import 'package:mqtt_app/modules/dashborad/light.dart';
 import 'package:provider/provider.dart';
 
 import 'modules/core/managers/MQTTManager.dart';
 import 'modules/helpers/screen_route.dart';
 import 'modules/helpers/service_locator.dart';
-import 'modules/message/screen/message_screen.dart';
+import 'modules/broker/screen/broker_screen.dart';
 import 'modules/settings/screen/settings_screen.dart';
 import 'modules/settings/screen/subscribe_screen.dart';
 import 'modules/dashborad/screen/dashborad.dart';
@@ -45,12 +43,11 @@ class MyApp extends StatelessWidget {
           initialRoute: '/',
           routes: {
             // '/': (BuildContext context) => AppDraw(),
-            '/': (BuildContext context) => MessageScreen(),
+            '/': (BuildContext context) => BrokerScreen(),
             SETTINGS_ROUTE: (BuildContext context) => SettingsScreen(),
             SUBSCRIBE_ROUTE: (BuildContext context) => SubscribeScreen(),
             DASHBORAD_ROUTE: (BuildContext context) => Dashborad(),
             MESS_ROUTE: (BuildContext context) => MessScreen(),
-            LIGHT_ROUTE: (BuildContext context) => FlashLight(),
             LOGGING_ROUTE: (BuildContext context) => Logs(),
             // ignore: equal_keys_in_map
             // Testing: (BuildContext context) => Homepage(),
@@ -105,7 +102,7 @@ class _AppDrawState extends State<AppDraw> {
         controller: _pageController,
         onPageChanged: onPageChanged,
         children: <Widget>[
-          MessageScreen(),
+          BrokerScreen(),
           Dashborad(),
         ],
       ),

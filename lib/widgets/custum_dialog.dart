@@ -88,7 +88,9 @@ class CustomDialog extends StatelessWidget {
                   onPressed: () {
                     Navigator.of(context).pop();
                     Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => Set_device()));
+                        MaterialPageRoute(builder: (context) => Set_device(
+                          //devicesinfo: ,
+                        )));
                   },
                 ),
                 SizedBox(height: 10.0),

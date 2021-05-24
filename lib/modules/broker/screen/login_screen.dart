@@ -8,11 +8,12 @@ import 'package:mqtt_app/modules/core/managers/MQTTManager.dart';
 import 'package:mqtt_app/modules/core/models/MQTTAppState.dart';
 import 'package:mqtt_app/modules/core/widgets/status_bar.dart';
 import 'package:mqtt_app/modules/helpers/status_info_message_utils.dart';
-import 'package:mqtt_app/modules/message/screen/message_screen.dart';
+import 'package:mqtt_app/modules/broker/screen/broker_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:ssl_pinning_plugin/ssl_pinning_plugin.dart';
 import 'package:flutter/services.dart';
 import 'package:mqtt_app/utilities/constants.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -21,7 +22,9 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool _ssl = false;
+  int _sslint = 0;
   bool _ws = false;
+  int _wsint = 0;
 
 ///////////
 
@@ -36,9 +39,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool _contentVisile = false;
 
+  final TextEditingController _serverTextController = TextEditingController();
   final TextEditingController _hostTextController = TextEditingController();
-  final TextEditingController _identifierTextController =
-      TextEditingController();
+  final TextEditingController _identifierTextController = TextEditingController();
   final TextEditingController _portTextController = TextEditingController();
   final TextEditingController _usernameTextController = TextEditingController();
   final TextEditingController _passwordTextController = TextEditingController();
@@ -47,6 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
+    _serverTextController.dispose();
     _hostTextController.dispose();
     _identifierTextController.dispose();
     _passwordTextController.dispose();
@@ -56,6 +60,42 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
 ////////
+  Widget _buildServername() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          'Server Name',
+          style: kLabelStyle,
+        ),
+        SizedBox(height: 10.0),
+        Container(
+          alignment: Alignment.centerLeft,
+          decoration: kBoxDecorationStyle,
+          height: 60.0,
+          child: TextField(
+            keyboardType: TextInputType.name,
+            controller: _serverTextController,
+            style: TextStyle(
+              color: Colors.white,
+              fontFamily: 'OpenSans',
+            ),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.only(top: 14.0),
+              prefixIcon: Icon(
+                Icons.email,
+                color: Colors.white,
+              ),
+              hintText: 'Enter your Server name',
+              hintStyle: kHintTextStyle,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
 
   Widget _buildUsername() {
     return Column(
@@ -265,6 +305,10 @@ class _LoginScreenState extends State<LoginScreen> {
               onChanged: (value) {
                 setState(() {
                   _ws = value;
+                  if(value == true)
+                      _wsint = 1;
+                  else
+                    _wsint = 0;
                 });
               },
             ),
@@ -292,6 +336,10 @@ class _LoginScreenState extends State<LoginScreen> {
               onChanged: (value) {
                 setState(() {
                   _ssl = value;
+                  if(value == true)
+                    _sslint = 1;
+                  else
+                    _sslint = 0;
                 });
               },
             ),
@@ -317,11 +365,14 @@ class _LoginScreenState extends State<LoginScreen> {
             _configureAndConnect();
 
             Task _newTask = Task(
+              servername: _serverTextController.text,
               title: _hostTextController.text,
               description: _portTextController.text,
               clientid: _identifierTextController.text,
               username: _usernameTextController.text,
               password: _passwordTextController.text,
+              useWS: _wsint,
+              useSSL: _sslint,
             );
 
             _taskId = await _dbHelper.insertTask(_newTask);
@@ -456,31 +507,6 @@ class _LoginScreenState extends State<LoginScreen> {
       st = _buildDisconnectBtn();
     }
     return st;
-    // GestureDetector(
-    //   onTap: () => print('Sign Up Button Pressed'),
-    //   child: RichText(
-    //     text: TextSpan(
-    //       children: [
-    //         TextSpan(
-    //           text: 'Don\'t have an Account? ',
-    //           style: TextStyle(
-    //             color: Colors.white,
-    //             fontSize: 18.0,
-    //             fontWeight: FontWeight.w400,
-    //           ),
-    //         ),
-    //         TextSpan(
-    //           text: 'Sign Up',
-    //           style: TextStyle(
-    //             color: Colors.white,
-    //             fontSize: 18.0,
-    //             fontWeight: FontWeight.bold,
-    //           ),
-    //         ),
-    //       ],
-    //     ),
-    //   ),
-    // );
   }
 
   @override
@@ -533,6 +559,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                             SizedBox(height: 30.0),
+                            _buildServername(),
+                            SizedBox(height: 30.0),
                             _buildHost(),
                             SizedBox(
                               height: 30.0,
@@ -562,17 +590,6 @@ class _LoginScreenState extends State<LoginScreen> {
                               height: 30.0,
                             ),
 
-                            // Row(
-                            //   children: <Widget> [
-                            //     _buildConnectBtn(),
-                            //     _buildDisconnectBtn(),
-                            //   ],
-                            // )
-
-                            // _buildRememberMeCheckbox(),
-                            // _buildLoginBtn(),
-                            // _buildSignInWithText(),
-                            // _buildSocialBtnRow(),
                             _buildSignupBtn(),
                           ],
                         ),
@@ -591,23 +608,7 @@ class _LoginScreenState extends State<LoginScreen> {
     // if (Platform.isAndroid) {
     //   osPrefix = 'Flutter_Android';
     // }
-    _manager.initializeMQTTClient(
-      host: _hostTextController.text,
-      identifier: _identifierTextController.text,
-      port: _portTextController.text,
-      password: _passwordTextController.text,
-      username: _usernameTextController.text,
-      // useWS: false
-    );
-
-    ///
-    if (_passwordTextController.text.isEmpty == true &&
-        _usernameTextController.text.isEmpty == true) {
-      _manager.connect1();
-    } else if (_ssl == false &&
-        _ws == true &&
-        _passwordTextController.text.isEmpty == false &&
-        _usernameTextController.text.isEmpty == false) {
+    if (_ssl == false && _ws == true) {
       _manager.initializeMQTTClientWS(
           host: _hostTextController.text, //_hostTextController.text,
           identifier: _identifierTextController.text,
@@ -615,13 +616,65 @@ class _LoginScreenState extends State<LoginScreen> {
           password: _passwordTextController.text,
           username: _usernameTextController.text,
           useWS: true);
+      if(_passwordTextController.text.isEmpty == false &&
+          _usernameTextController.text.isEmpty == false) {
+        _manager.connect_Websocket();
+      }
+      else if (_passwordTextController.text.isEmpty == true&&
+          _usernameTextController.text.isEmpty == true)
+      {
+        _manager.connect_Websocket_WUP();
+      }
+      else{
+        //_manager.connect1();
+      }
 
-      _manager.connect();
-    } else {
-      _manager.connect();
     }
-    // _manager.connect();
+
+    else if (_ssl == true && _ws == false) {
+      _manager.initializeMQTTClientSSL(
+          host: _hostTextController.text, //_hostTextController.text,
+          identifier: _identifierTextController.text,
+          port: _portTextController.text,
+          password: _passwordTextController.text,
+          username: _usernameTextController.text);
+      if(_passwordTextController.text.isEmpty == false &&
+          _usernameTextController.text.isEmpty == false) {
+        _manager.connect_SSL();
+      }
+      else{
+        _manager.connect_SSL_WUP();
+      }
+    }
+
+    else if(_ssl == true && _ws == true)
+    {
+      print("you can't do it both");
+    }
+
+    else {
+      _manager.initializeMQTTClient(
+        host: _hostTextController.text,
+        identifier: _identifierTextController.text,
+        port: _portTextController.text,
+        password: _passwordTextController.text,
+        username: _usernameTextController.text,
+        // useWS: false
+      );
+
+      if(_passwordTextController.text.isEmpty == false &&
+          _usernameTextController.text.isEmpty == false) {
+        _manager.connect();
+      }
+
+      else if (_passwordTextController.text.isEmpty == true&&
+          _usernameTextController.text.isEmpty == true)
+      {
+        _manager.connect_WUP();
+      }
+    }
   }
+
 
   void _disconnect() {
     _manager.disconnect();

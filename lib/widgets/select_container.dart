@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:mqtt_app/screens/detail_screen.dart';
-import 'package:mqtt_app/screens/detail_screen_fan.dart';
+import 'package:mqtt_app/modules/dashborad/screen/widgetRoom/detail_screen.dart';
+import 'package:mqtt_app/modules/dashborad/screen/widgetRoom/detail_screen_fan.dart';
+import 'package:mqtt_app/modules/dashborad/screen/widgetRoom/detail_screen_sound.dart';
+import 'package:mqtt_app/modules/dashborad/screen/widgetRoom/detail_screen_heater.dart';
 
 class SelectContainer extends StatelessWidget {
   final String icon;
   final String name;
+  final room;
 
-  SelectContainer({
-    @required this.icon,
-    @required this.name,
-  });
+  SelectContainer(
+      {@required this.icon, @required this.name, @required this.room});
 
   @override
   Widget build(BuildContext context) {
@@ -27,17 +28,27 @@ class SelectContainer extends StatelessWidget {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => DetailScreen(room: name)));
+                        builder: (context) =>
+                            DetailScreen(title: name, room: room)));
               } else if (name == "Fan") {
                 // Navigator.pop(context);
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => DetailScreen_fan(title: name)));
+                        builder: (context) =>
+                            DetailScreen_fan(title: name, room: room)));
               } else if (name == "Sound") {
-                //
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            DetailScreen_sound(title: name, room: room)));
               } else if (name == "Heater") {
-                //
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            DetailScreen_heater(title: name, room: room)));
               }
             },
             child: Container(

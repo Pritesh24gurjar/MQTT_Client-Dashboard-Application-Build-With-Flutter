@@ -1,24 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:mqtt_app/helpers/database_helper.dart';
-import 'package:mqtt_app/modules/dashborad/screen/device_form.dart';
-import 'package:mqtt_app/modules/dashborad/screen/room_form.dart';
-import 'package:mqtt_app/modules/helpers/screen_route.dart';
+import 'package:mqtt_app/modules/dashborad/screen/updatePage/device_form.dart';
+import 'package:mqtt_app/modules/dashborad/screen/updatePage/room_form.dart';
+import 'package:mqtt_app/modules/dashborad/screen/updatePage/device_image_form.dart';
+import 'package:mqtt_app/modules/dashborad/screen/updatePage/device_range_form.dart';
+import 'package:mqtt_app/modules/dashborad/screen/updatePage/device_choice_form.dart';
+
+import 'package:mqtt_app/modules/dashborad/screen/widget/switchinside.dart';
+import 'package:mqtt_app/modules/dashborad/screen/widget/controllerinside.dart';
+import 'package:mqtt_app/modules/dashborad/screen/widget/temperatureinside.dart';
+import 'package:mqtt_app/modules/dashborad/screen/widget/choiceinside.dart';
+import 'package:mqtt_app/modules/dashborad/screen/widget/lightinside.dart';
+import 'package:mqtt_app/modules/dashborad/screen/widget/textinside.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:mqtt_app/modules/message/screen/message_screen.dart';
+import 'package:mqtt_app/modules/broker/screen/broker_screen.dart';
 import 'package:mqtt_app/modules/core/managers/MQTTManager.dart';
-import 'package:mqtt_app/modules/core/models/MQTTAppState.dart';
-import 'package:mqtt_app/screens/deviceUpdate.dart';
+
 import 'package:mqtt_app/widgets/custum_dialog.dart';
-import 'package:mqtt_client/mqtt_client.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:mqtt_app/models/devices_model.dart';
-import 'package:mqtt_app/models/rooms_model.dart';
-import 'package:mqtt_app/screens/screens.dart';
+import 'package:mqtt_app/modules/dashborad/screen/widgetRoom/screens.dart';
 import 'package:mqtt_app/widgets/widgets.dart';
-import 'package:custom_switch/custom_switch.dart';
+
+import 'package:url_launcher/url_launcher.dart';
 
 hexColor(String colorhexcode) {
   String colornew = '0xff' + colorhexcode;
@@ -42,52 +47,6 @@ class _Dashborad extends State<Dashborad> {
   bool status = false;
   Icon floatingIcon = new Icon(Icons.add);
   var datatemp = 'text';
-
-  // TextDynamic(BuildContext context) {
-  //   //dynamicList.add(new AddText());
-  //   dynamicList.add(Textwidth(_manager.currentState));
-  //   setState(() {});
-  // }
-
-  // SwitchDynamic(BuildContext context) {
-  //   //dynamicList.add(new AddText());
-  //   dynamicList.add(Switchwidth(_manager.currentState));
-  //   setState(() {});
-  // }
-
-  // SliderDynamic(BuildContext context) {
-  //   //dynamicList.add(new AddSlider());
-  //   setState(() {});
-  // }
-
-  // LEDDynamic(BuildContext context) {
-  //   dynamicList.add(Ledwidth(_manager.currentState));
-  //   setState(() {});
-  // }
-
-  // List<RoomsModel> _listRooms = [
-  //   RoomsModel(image: 'assets/images/kitchen.jpg', name: 'Kitchen', temp: '24'),
-  //   RoomsModel(
-  //       image: 'assets/images/livingroom.jpg', name: 'Living room', temp: '25'),
-  //   RoomsModel(image: 'assets/images/bedroom.jpg', name: 'Bedroom', temp: '28'),
-  //   RoomsModel(
-  //       image: 'assets/images/bathroom.jpg', name: 'Bathroom', temp: '27'),
-  // ];
-
-  // List<DevicesModel> _listDevices = [
-  //   DevicesModel(image: 'assets/images/microwave.png', name: 'Microwave'),
-  //   DevicesModel(image: 'assets/images/range_hood.png', name: 'Range hood'),
-  //   DevicesModel(image: 'assets/images/tv.png', name: 'TV'),
-  //   DevicesModel(image: 'assets/images/refrigerator.png', name: 'Refrigerator'),
-  // ];
-  String sub(a) {
-    if (_manager.currentState.getAppConnectionState ==
-        MQTTAppConnectionState.connected) {
-      var b = _manager.subScribeTo(a);
-      print("------------------------- $b ----------------------");
-      return b;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -149,8 +108,9 @@ class _Dashborad extends State<Dashborad> {
                                   child: CateContainer(
                                     image: 'assets/images/livingroom.jpg',
                                     name: snapshot.data[index].title,
-                                    temp: sub(snapshot.data[index].sub),
+                                    //temp: sub(snapshot.data[index].sub),
                                     onTap: () {
+                                      //print(snapshot.data[index]);
                                       Navigator.push(
                                           context,
                                           MaterialPageRoute(
@@ -194,25 +154,212 @@ class _Dashborad extends State<Dashborad> {
                                   child: Padding(
                                     padding: const EdgeInsets.only(top: 16.0),
                                     child: GestureDetector(
-                                      onTap: () {},
-                                      onLongPress: () async {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => Device_form(
-                                              devices: snapshot.data[index],
+                                      onTap: () async {
+                                        print(snapshot.data[index].style);
+                                        if (snapshot.data[index].style ==
+                                            'SetSwitch') {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  switchinside(
+                                                title:
+                                                    snapshot.data[index].title,
+                                                pub: snapshot.data[index].sub,
+                                                qos: snapshot.data[index].qos,
+                                              ),
                                             ),
-                                          ),
-                                        ).then(
-                                          (value) {
-                                            setState(() {});
-                                          },
-                                        );
+                                          ).then(
+                                            (value) {
+                                              setState(() {});
+                                            },
+                                          );
+                                        } else if (snapshot.data[index].style ==
+                                            'SetController') {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  controllerinside(
+                                                title:
+                                                    snapshot.data[index].title,
+                                                pub: snapshot.data[index].sub,
+                                                qos: snapshot.data[index].qos,
+                                              ),
+                                            ),
+                                          ).then(
+                                            (value) {
+                                              setState(() {});
+                                            },
+                                          );
+                                        } else if (snapshot.data[index].style ==
+                                            'Setthermostat') {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  temperatureinside(
+                                                title:
+                                                    snapshot.data[index].title,
+                                                pub: snapshot.data[index].sub,
+                                                qos: snapshot.data[index].qos,
+                                                min: snapshot.data[index].min,
+                                                max: snapshot.data[index].max,
+                                              ),
+                                            ),
+                                          ).then(
+                                            (value) {
+                                              setState(() {});
+                                            },
+                                          );
+                                        } else if (snapshot.data[index].style ==
+                                            'muiltChoice') {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  choiceinside(
+                                                      title: snapshot
+                                                          .data[index].title,
+                                                      pub: snapshot
+                                                          .data[index].sub,
+                                                      qos: snapshot
+                                                          .data[index].qos,
+                                                      devicesinfo:
+                                                          snapshot.data[index]),
+                                            ),
+                                          ).then(
+                                            (value) {
+                                              setState(() {});
+                                            },
+                                          );
+                                        } else if (snapshot.data[index].style ==
+                                            'colorValue') {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => lightinside(
+                                                title:
+                                                    snapshot.data[index].title,
+                                                pub: snapshot.data[index].sub,
+                                                qos: snapshot.data[index].qos,
+                                              ),
+                                            ),
+                                          ).then(
+                                            (value) {
+                                              setState(() {});
+                                            },
+                                          );
+                                        } else if (snapshot.data[index].style ==
+                                            'TextValue') {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => textinside(
+                                                title:
+                                                    snapshot.data[index].title,
+                                                pub: snapshot.data[index].sub,
+                                                qos: snapshot.data[index].qos,
+                                              ),
+                                            ),
+                                          ).then(
+                                            (value) {
+                                              setState(() {});
+                                            },
+                                          );
+                                        } else if (snapshot.data[index].style ==
+                                            'ImageValue') {
+                                          if (snapshot
+                                                  .data[index].savewebclick ==
+                                              '') {
+                                            _buildigimage(context,
+                                                snapshot.data[index].saveweb);
+                                          } else {
+                                            _launchURL(snapshot
+                                                .data[index].savewebclick);
+                                            //_buildigimage(context,snapshot.data[index].saveweb);
+                                          }
+                                          /*Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => textinside(
+                                                title: snapshot.data[index].title,
+                                                pub: snapshot.data[index].sub,
+                                                qos: snapshot.data[index].qos,
+                                              ),
+                                            ),
+                                          ).then(
+                                                (value) {
+                                              setState(() {});
+                                            },
+                                          );*/
+                                          //_launchURL();
+                                        }
                                       },
-                                      child: Devices(
+                                      onLongPress: () async {
+                                        if (snapshot.data[index].style ==
+                                            'Setthermostat') {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  Device_range_form(
+                                                devices: snapshot.data[index],
+                                              ),
+                                            ),
+                                          ).then(
+                                            (value) {
+                                              setState(() {});
+                                            },
+                                          );
+                                        } else if (snapshot.data[index].style ==
+                                            'ImageValue') {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  Device_image_form(
+                                                devices: snapshot.data[index],
+                                              ),
+                                            ),
+                                          ).then(
+                                            (value) {
+                                              setState(() {});
+                                            },
+                                          );
+                                        } else if (snapshot.data[index].style ==
+                                            'muiltChoice') {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  Device_choice_form(
+                                                devices: snapshot.data[index],
+                                              ),
+                                            ),
+                                          ).then(
+                                            (value) {
+                                              setState(() {});
+                                            },
+                                          );
+                                        } else {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => Device_form(
+                                                devices: snapshot.data[index],
+                                              ),
+                                            ),
+                                          ).then(
+                                            (value) {
+                                              setState(() {});
+                                            },
+                                          );
+                                        }
+                                      },
+                                      child: Devicess(
                                         image: 'assets/images/tv.png',
                                         name: snapshot.data[index].title,
-
                                         // image: _listDevices[index].image,
                                         // name: _listDevices[index].name,
                                       ),
@@ -232,18 +379,6 @@ class _Dashborad extends State<Dashborad> {
           ),
         ),
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () {
-      //     //       if (datatemp=="text")
-      //     // {
-      //     //   // TextDynamic(context);
-      //     //   Textwidth(_manager.currentState);
-      //     // }
-      //     showAlertDialog(context);
-      //   },
-      //   child: Icon(Icons.add),
-      //   backgroundColor: Colors.green,
-      // ),
     );
   }
 
@@ -300,295 +435,23 @@ class _Dashborad extends State<Dashborad> {
       ),
     );
   }
-}
-//   showAlertDialog(BuildContext context) {
-//     // set up the list options
-//     Widget optionOne = SimpleDialogOption(
-//       child: const Text('Text'),
-//       onPressed: () {
-//         print('Text');
-//         TextDynamic(context);
-//         Navigator.of(context).pop();
-//       },
-//     );
-//     Widget optionTwo = SimpleDialogOption(
-//       child: const Text('Switch/button'),
-//       onPressed: () {
-//         print('Switch/button');
-//         SwitchDynamic(context);
-//         Navigator.of(context).pop();
-//       },
-//     );
-//     Widget optionThree = SimpleDialogOption(
-//       child: const Text('Range/Progress'),
-//       onPressed: () {
-//         print('Range/Progress');
-//         SliderDynamic(context);
-//         Navigator.of(context).pop();
-//       },
-//     );
-//     Widget optionFour = SimpleDialogOption(
-//       child: const Text('Multi choice'),
-//       onPressed: () {
-//         print('Multi choice');
-//         Navigator.of(context).pop();
-//       },
-//     );
-//     Widget optionFive = SimpleDialogOption(
-//       child: const Text('Image'),
-//       onPressed: () {
-//         print('Image');
-//         Navigator.of(context).pop();
-//       },
-//     );
-//     Widget optionSix = SimpleDialogOption(
-//       child: const Text('Color'),
-//       onPressed: () {
-//         print('Color');
-//         LEDDynamic(context);
-//         Navigator.of(context).pop();
-//       },
-//     );
 
-//     // set up the SimpleDialog
-//     SimpleDialog dialog = SimpleDialog(
-//       title: const Text('Choose type'),
-//       children: <Widget>[
-//         optionOne,
-//         optionTwo,
-//         optionThree,
-//         optionFour,
-//         optionFive,
-//         optionSix,
-//       ],
-//     );
-
-//     // show the dialog
-//     showDialog(
-//       context: context,
-//       builder: (BuildContext context) {
-//         return dialog;
-//       },
-//     );
-//   }
-// }
-
-// class AppDrawer extends StatefulWidget {
-//   @override
-//   _AppDrawerState createState() => _AppDrawerState();
-// }
-
-// class _AppDrawerState extends State<AppDrawer> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return new Drawer(
-//         child: new ListView(
-//       children: <Widget>[
-//         new DrawerHeader(
-//           child: Text(
-//             "MQTT APP",
-//             style: TextStyle(
-//               color: Colors.white,
-//               fontSize: 24,
-//             ),
-//           ),
-//           decoration: BoxDecoration(
-//             color: Colors.blueAccent,
-//           ),
-//         ),
-//         new ListTile(
-//           leading: Icon(
-//             Icons.account_circle,
-//             color: Colors.blueAccent,
-//           ),
-//           title: Text(
-//             "Dashborad",
-//             style: TextStyle(
-//               color: Colors.blueAccent,
-//               fontSize: 16,
-//             ),
-//           ),
-//           onTap: () {
-//             Navigator.of(context).pushNamed(DASHBORAD_ROUTE);
-//           },
-//         ),
-//         new ListTile(
-//           leading: Icon(
-//             Icons.cloud_download,
-//             color: Colors.blueAccent,
-//           ),
-//           title: Text(
-//             "Main",
-//             style: TextStyle(
-//               color: Colors.blueAccent,
-//               fontSize: 16,
-//             ),
-//           ),
-//           onTap: () {
-//             Navigator.of(context).pushNamed('/');
-//           },
-//         ),
-//         new ListTile(
-//           leading: Icon(
-//             Icons.message_outlined,
-//             color: Colors.blueAccent,
-//           ),
-//           title: Text(
-//             "Message",
-//             style: TextStyle(
-//               color: Colors.blueAccent,
-//               fontSize: 16,
-//             ),
-//           ),
-//           onTap: () {
-//             Navigator.of(context).pushNamed(MESS_ROUTE);
-//           },
-//         ),
-//         new ListTile(
-//           leading: Icon(
-//             Icons.lightbulb,
-//             color: Colors.blueAccent,
-//           ),
-//           title: Text(
-//             "light on/off",
-//             style: TextStyle(
-//               color: Colors.blueAccent,
-//               fontSize: 16,
-//             ),
-//           ),
-//           onTap: () {
-//             Navigator.of(context).pushNamed(LIGHT_ROUTE);
-//           },
-//         ),
-//         new ListTile(
-//           leading: Icon(
-//             Icons.lightbulb,
-//             color: Colors.blueAccent,
-//           ),
-//           title: Text(
-//             "Logging",
-//             style: TextStyle(
-//               color: Colors.blueAccent,
-//               fontSize: 16,
-//             ),
-//           ),
-//           onTap: () {
-//             Navigator.of(context).pushNamed(LOGGING_ROUTE);
-//           },
-//         ),
-//       ],
-//     ));
-//   }
-// }
-
-Widget Textwidth(MQTTAppState currentAppState) {
-  return Container(
-    margin: new EdgeInsets.only(left: 100.0, right: 100.0, bottom: 20.0),
-    padding: const EdgeInsets.all(5.0),
-    width: 100,
-    height: 100,
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(5),
-      color: Colors.black12,
-    ),
-    child: Center(
-      child: Text(
-        currentAppState.getReceivedText,
-        textAlign: TextAlign.center,
-      ),
-    ),
-  );
-}
-
-Widget Switchwidth(MQTTAppState currentAppState) {
-  bool status = false;
-  return Column(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: <Widget>[
-      CustomSwitch(
-        activeColor: Colors.green,
-        value: status,
-        onChanged: (value) {},
-      ),
-      SizedBox(
-        height: 6.0,
-      ),
-    ],
-  );
-}
-
-/*class AddSlider extends StatefulWidget{
-  _AddSlider createState()=> _AddSlider();
-}
-
-class _AddSlider extends State<AddSlider> {
-  double _value = 0;
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: new EdgeInsets.all(8.0),
-      child: new Slider(
-        value: _value.toDouble(),
-        min: 0.0,
-        max: 100.0,
-        divisions: 100,
-        activeColor: Colors.green,
-        inactiveColor: Colors.orange,
-        label: _value.round().toString(),
-        onChanged: (double newValue) {
-          setState(() {
-            _value = newValue;
-          });
-        },
-      ),
-    );
+  _launchURL(String test) async {
+    String url = test;
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
-}*/
 
-/*Widget Sliderwidth(String text) {
-    return Container(
-      margin: new EdgeInsets.all(8.0),
-      child: new Slider(
-        value: _value.toDouble(),
-        min: 0.0,
-        max: 100.0,
-        divisions: 100,
-        activeColor: Colors.green,
-        inactiveColor: Colors.orange,
-        label: _value.round().toString(),
-        onChanged: (double newValue) {
-          setState(() {
-            _value = newValue;
-          });
-        },
-      ),
-    );
-}*/
-
-/*class AddLed extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: new EdgeInsets.all(15.0),
-      height: 42.0,
-      width: 42.0,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(2),
-        color: Colors.red,
-      ),
-    );
+  Future<void> _buildigimage(BuildContext context, String test) async {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            child: Image.network(test),
+          );
+        });
   }
-}*/
-
-Widget Ledwidth(MQTTAppState currentAppState) {
-  String test = currentAppState.getReceivedText;
-  return Container(
-    margin: new EdgeInsets.all(15.0),
-    height: 42.0,
-    width: 42.0,
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(2),
-      color: Color(hexColor(test)),
-    ),
-  );
 }
