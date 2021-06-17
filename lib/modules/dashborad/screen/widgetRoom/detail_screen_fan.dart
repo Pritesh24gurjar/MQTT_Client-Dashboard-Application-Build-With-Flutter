@@ -2,10 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mqtt_app/models/models.dart';
 import 'package:mqtt_app/models/select_model.dart';
+import 'package:mqtt_app/modules/core/managers/MQTTManager.dart';
 
 import 'package:mqtt_app/widgets/lighting_card.dart';
 import 'package:mqtt_app/widgets/widgets.dart';
 import 'package:neuomorphic_container/neuomorphic_container.dart';
+import 'package:provider/provider.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
 
 class DetailScreen_fan extends StatefulWidget {
@@ -58,7 +60,8 @@ class _DetailScreenState extends State<DetailScreen_fan> {
   Widget build(BuildContext context) {
     double _width = MediaQuery.of(context).size.width;
     double _height = MediaQuery.of(context).size.height;
-
+    MQTTManager _manager;
+    _manager = Provider.of<MQTTManager>(context);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue[300],
@@ -148,6 +151,7 @@ class _DetailScreenState extends State<DetailScreen_fan> {
                 child: Center(
                   child: GestureDetector(
                     onTap: () {
+                      String sub = widget.room.sub.toString();
                       print("tap");
                       if (isTurnon) {
                         print("turnoff");
@@ -155,7 +159,7 @@ class _DetailScreenState extends State<DetailScreen_fan> {
                         // Flashlight.lightOff();
 
                         setState(() {
-                          // _manager.publish('off', 1, _topicContent, _retainValue);
+                          _manager.publish('off', 1, sub, false);
                           isTurnon = false;
                           // flashicon = Icons.flash_off;
                           col = Colors.grey;
@@ -164,7 +168,8 @@ class _DetailScreenState extends State<DetailScreen_fan> {
                         print("turnon");
                         //if light is off, then turn on.
                         // Flashlight.lightOn();
-                        // _manager.publish('on', 1, _topicContent, _retainValue);
+
+                        _manager.publish('on', 1, sub, false);
                         setState(() {
                           isTurnon = true;
                           // flashicon = Icons.flash_on;

@@ -45,7 +45,6 @@ class _lightinside extends State<lightinside> {
     super.initState();
   }
 
-
   @override
   void dispose() {
     _messageTextController.dispose();
@@ -121,8 +120,8 @@ class _lightinside extends State<lightinside> {
                       hex[6] +
                       hex[7] +
                       hex[8];
-                  /*_manager.publishColor(
-                      hex.toString(), widget.qos, widget.pub, _retainValue);*/
+                  _manager.publishColor(
+                      hex.toString(), widget.qos, widget.pub, _retainValue);
                   test = hex;
                 },
               ),
@@ -134,34 +133,34 @@ class _lightinside extends State<lightinside> {
             ListTile(
               title: const Text('HEX'),
               leading: Radio<SingingCharacter>(
-              value: SingingCharacter.lafayette,
-              groupValue: _character,
-              onChanged: (SingingCharacter value) {
-              setState(() {
-              _character = value;
-                      });
-                   },
+                value: SingingCharacter.lafayette,
+                groupValue: _character,
+                onChanged: (SingingCharacter value) {
+                  setState(() {
+                    _character = value;
+                  });
+                },
               ),
             ),
             ListTile(
-              title: const Text('Number String'),
-              leading: Radio<SingingCharacter>(
-              value: SingingCharacter.jefferson,
-              groupValue: _character,
-              onChanged: (SingingCharacter value) {
-              setState(() {
-                 _character = value;
-                      });
-                    },
-              )
-            ),
+                title: const Text('Number String'),
+                leading: Radio<SingingCharacter>(
+                  value: SingingCharacter.jefferson,
+                  groupValue: _character,
+                  onChanged: (SingingCharacter value) {
+                    setState(() {
+                      _character = value;
+                    });
+                  },
+                )),
 
             const SizedBox(height: 40),
             Container(
               child: RaisedButton(
                 elevation: 5.0,
                 onPressed: () async {
-                  _manager.publishColor(test.toString(), widget.qos, widget.pub, _retainValue);
+                  _manager.publishColor(
+                      test.toString(), widget.qos, widget.pub, _retainValue);
                 },
                 padding: EdgeInsets.all(10.0),
                 shape: RoundedRectangleBorder(
@@ -179,7 +178,7 @@ class _lightinside extends State<lightinside> {
                   ),
                 ),
               ),
-                /*icon: Icon(
+              /*icon: Icon(
                   flashicon,
                   color: Colors.white,
                 ),
@@ -188,7 +187,7 @@ class _lightinside extends State<lightinside> {
                   isturnon ? 'TURN OFF' : 'TURN ON',
                   style: TextStyle(color: Colors.white),
                 ),*/
-              ),
+            ),
           ],
         ),
       );

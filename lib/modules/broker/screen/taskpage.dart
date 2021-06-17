@@ -37,7 +37,8 @@ class _TaskScreenState extends State<Taskpage> {
 
   final TextEditingController _serverTextController = TextEditingController();
   final TextEditingController _hostTextController = TextEditingController();
-  final TextEditingController _identifierTextController = TextEditingController();
+  final TextEditingController _identifierTextController =
+      TextEditingController();
   final TextEditingController _portTextController = TextEditingController();
   final TextEditingController _usernameTextController = TextEditingController();
   final TextEditingController _passwordTextController = TextEditingController();
@@ -60,10 +61,8 @@ class _TaskScreenState extends State<Taskpage> {
     }
     print(_wsint);
     print(_sslint);
-    if(_wsint == 1)
-      _ws =  true;
-    if(_sslint == 1)
-      _ssl = true;
+    if (_wsint == 1) _ws = true;
+    if (_sslint == 1) _ssl = true;
 
     _titleFocus = FocusNode();
     _descriptionFocus = FocusNode();
@@ -385,7 +384,7 @@ class _TaskScreenState extends State<Taskpage> {
               activeColor: Colors.white,
               onChanged: (value) async {
                 _ws = value;
-                if(value == true)
+                if (value == true)
                   _wsint = 1;
                 else
                   _wsint = 0;
@@ -417,15 +416,15 @@ class _TaskScreenState extends State<Taskpage> {
               checkColor: Colors.green,
               activeColor: Colors.white,
               onChanged: (value) async {
-                  _ssl = value;
-                  if(value == true)
-                    _sslint = 1;
-                  else
-                    _sslint = 0;
-                  setState(() async {
-                    await _dbHelper.updateTaskSSL(_taskId, _sslint);
-                  });
-                  _todoFocus.requestFocus();
+                _ssl = value;
+                if (value == true)
+                  _sslint = 1;
+                else
+                  _sslint = 0;
+                setState(() async {
+                  await _dbHelper.updateTaskSSL(_taskId, _sslint);
+                });
+                _todoFocus.requestFocus();
               },
             ),
           ),
@@ -446,7 +445,8 @@ class _TaskScreenState extends State<Taskpage> {
       child: RaisedButton(
         elevation: 5.0,
         onPressed: () async {
-          await _dbHelper.updateTaskServername(_taskId, _serverTextController.text);
+          await _dbHelper.updateTaskServername(
+              _taskId, _serverTextController.text);
           await _dbHelper.updateTaskTitle(_taskId, _hostTextController.text);
           await _dbHelper.updateTaskDescription(
               _taskId, _portTextController.text);

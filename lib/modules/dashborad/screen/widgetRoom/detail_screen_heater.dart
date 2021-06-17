@@ -9,10 +9,12 @@ import 'package:flutter_thermometer/setpoint.dart';
 import 'package:flutter_thermometer/thermometer.dart';
 import 'package:flutter_thermometer/thermometer_paint.dart';
 import 'package:flutter_thermometer/thermometer_widget.dart';
+import 'package:mqtt_app/modules/core/managers/MQTTManager.dart';
 
 import 'package:mqtt_app/widgets/lighting_card.dart';
 import 'package:mqtt_app/widgets/widgets.dart';
 import 'package:neuomorphic_container/neuomorphic_container.dart';
+import 'package:provider/provider.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
 
 class DetailScreen_heater extends StatefulWidget {
@@ -27,7 +29,7 @@ class DetailScreen_heater extends StatefulWidget {
 class _DetailScreenState extends State<DetailScreen_heater> {
   var isTurnon = false;
   var col = Color(0XFF26282B);
-  var _test = 0.0;
+  var value = 0.0;
   double minValue = 0.0;
   double maxValue = 150.0;
   var thermoWidth = 150.0;
@@ -71,7 +73,8 @@ class _DetailScreenState extends State<DetailScreen_heater> {
   Widget build(BuildContext context) {
     double _width = MediaQuery.of(context).size.width;
     double _height = MediaQuery.of(context).size.height;
-
+    MQTTManager _manager;
+    _manager = Provider.of<MQTTManager>(context);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue[300],
@@ -127,10 +130,20 @@ class _DetailScreenState extends State<DetailScreen_heater> {
                   overlayShape: RoundSliderOverlayShape(overlayRadius: 28.0),
                 ),
                 child: Slider(
-                  value: _test,
-                  onChanged: (value) {
+                  value: value,
+                  min: 0,
+                  max: 100,
+                  label: '${value.toInt()}%',
+                  divisions: 100,
+                  //inactiveColor: Colors.grey[300],
+                  onChanged: (val) {
+                    value = val;
+                    print(val);
+                    _manager.publish(
+                        value.toInt().toString(), 1, widget.room.sub, false);
                     setState(() {
-                      _test = value;
+                      // _manager.publish(
+                      //     value.toString(), widget.qos, widget.pub, false);
                     });
                   },
                 ),
@@ -157,12 +170,13 @@ class _DetailScreenState extends State<DetailScreen_heater> {
                 child: Center(
                   child: GestureDetector(
                     onTap: () {
+                      String sub = widget.room.sub.toString();
                       print("tap");
                       if (isTurnon) {
                         print("turnoff");
                         //if light is on, then turn off
                         // Flashlight.lightOff();
-
+                        _manager.publish('off', 1, sub, false);
                         setState(() {
                           // _manager.publish('off', 1, _topicContent, _retainValue);
                           isTurnon = false;
@@ -173,6 +187,7 @@ class _DetailScreenState extends State<DetailScreen_heater> {
                         print("turnon");
                         //if light is off, then turn on.
                         // Flashlight.lightOn();
+                        _manager.publish('off', 1, sub, false);
                         // _manager.publish('on', 1, _topicContent, _retainValue);
                         setState(() {
                           isTurnon = true;

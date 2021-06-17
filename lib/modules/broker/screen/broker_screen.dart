@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:mqtt_app/helpers/database_helper.dart';
 import 'package:mqtt_app/modules/core/managers/MQTTManager.dart';
 import 'package:mqtt_app/modules/helpers/screen_route.dart';
@@ -199,52 +200,45 @@ class _BrokerScreenState extends State<BrokerScreen> {
                                 onTap: () {
                                   _manager.disconnect();
 
-                                  if (snapshot.data[index].useSSL == 0 && snapshot.data[index].useWS == 1) {
+                                  if (snapshot.data[index].useSSL == 0 &&
+                                      snapshot.data[index].useWS == 1) {
                                     _manager.initializeMQTTClientWS(
                                         host: snapshot.data[index].title,
-                                        identifier: snapshot.data[index].clientid,
+                                        identifier:
+                                            snapshot.data[index].clientid,
                                         port: snapshot.data[index].description,
                                         username: snapshot.data[index].username,
                                         password: snapshot.data[index].password,
                                         useWS: true);
-                                    if(snapshot.data[index].username != null &&
+                                    if (snapshot.data[index].username != null &&
                                         snapshot.data[index].password != null) {
                                       _manager.connect_Websocket();
-                                    }
-                                    else if (snapshot.data[index].username == null&&
-                                        snapshot.data[index].password == null)
-                                    {
+                                    } else if (snapshot.data[index].username ==
+                                            null &&
+                                        snapshot.data[index].password == null) {
                                       _manager.connect_Websocket_WUP();
-                                    }
-                                    else{
+                                    } else {
                                       //_manager.connect1();
                                     }
-
-                                  }
-
-                                  else if (snapshot.data[index].useSSL == 1 && snapshot.data[index].useWS == 0) {
+                                  } else if (snapshot.data[index].useSSL == 1 &&
+                                      snapshot.data[index].useWS == 0) {
                                     _manager.initializeMQTTClientSSL(
-                                        host: snapshot.data[index].title,
-                                        identifier: snapshot.data[index].clientid,
-                                        port: snapshot.data[index].description,
-                                        username: snapshot.data[index].username,
-                                        password: snapshot.data[index].password,
+                                      host: snapshot.data[index].title,
+                                      identifier: snapshot.data[index].clientid,
+                                      port: snapshot.data[index].description,
+                                      username: snapshot.data[index].username,
+                                      password: snapshot.data[index].password,
                                     );
-                                    if(snapshot.data[index].username != null &&
+                                    if (snapshot.data[index].username != null &&
                                         snapshot.data[index].password != null) {
                                       _manager.connect_SSL();
-                                    }
-                                    else{
+                                    } else {
                                       _manager.connect_SSL_WUP();
                                     }
-                                  }
-
-                                  else if(snapshot.data[index].useSSL == 1 && snapshot.data[index].useWS == 1)
-                                  {
+                                  } else if (snapshot.data[index].useSSL == 1 &&
+                                      snapshot.data[index].useWS == 1) {
                                     print("you can't do it both");
-                                  }
-
-                                  else {
+                                  } else {
                                     _manager.initializeMQTTClient(
                                       host: snapshot.data[index].title,
                                       identifier: snapshot.data[index].clientid,
@@ -253,14 +247,12 @@ class _BrokerScreenState extends State<BrokerScreen> {
                                       password: snapshot.data[index].password,
                                     );
 
-                                    if(snapshot.data[index].username != null &&
+                                    if (snapshot.data[index].username != null &&
                                         snapshot.data[index].password != null) {
                                       _manager.connect();
-                                    }
-
-                                    else if (snapshot.data[index].username == null&&
-                                        snapshot.data[index].password == null)
-                                    {
+                                    } else if (snapshot.data[index].username ==
+                                            null &&
+                                        snapshot.data[index].password == null) {
                                       _manager.connect_WUP();
                                     }
                                   }
@@ -297,6 +289,53 @@ class _BrokerScreenState extends State<BrokerScreen> {
           ),
         ),
       ),
+      floatingActionButton: SpeedDial(
+        // both default to 16
+        marginRight: 18,
+        marginBottom: 20,
+        animatedIcon: AnimatedIcons.menu_close,
+        animatedIconTheme: IconThemeData(size: 22.0),
+        // this is ignored if animatedIcon is non null
+        // child: Icon(Icons.add),
+        visible: _dialVisible,
+        // If true user is forced to close dial manually
+        // by tapping main button and overlay is not rendered.
+        closeManually: false,
+        curve: Curves.bounceIn,
+        overlayColor: Colors.black,
+        overlayOpacity: 0.5,
+        onOpen: () => print('OPENING DIAL'),
+        onClose: () => print('DIAL CLOSED'),
+        tooltip: 'Speed Dial',
+        heroTag: 'speed-dial-hero-tag',
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 8.0,
+        shape: CircleBorder(),
+        children: [
+          SpeedDialChild(
+            child: Icon(Icons.accessibility),
+            backgroundColor: Colors.red,
+            label: 'Subscribe',
+            labelStyle: TextStyle(fontSize: 18.0),
+            onTap: () => Navigator.of(context).pushNamed(SUBSCRIBE_ROUTE),
+          ),
+          SpeedDialChild(
+            child: Icon(Icons.flash_auto),
+            backgroundColor: Colors.blue,
+            label: 'Light on/off',
+            labelStyle: TextStyle(fontSize: 18.0),
+            onTap: () => Navigator.of(context).pushNamed(LIGHT_ROUTE),
+          ),
+          SpeedDialChild(
+            child: Icon(Icons.message_rounded),
+            backgroundColor: Colors.green,
+            label: 'Advanced Text',
+            labelStyle: TextStyle(fontSize: 18.0),
+            onTap: () => Navigator.of(context).pushNamed(MESS_ROUTE),
+          ),
+        ],
+      ),
     );
   }
 
@@ -323,21 +362,22 @@ class _BrokerScreenState extends State<BrokerScreen> {
               },*/
               child: Ink(
                 decoration: const ShapeDecoration(
-                shape: CircleBorder(),
-              ),
-              child: IconButton(
-                //Icons.add_circle_outline,
-                // size: 26.0,
-                icon: const Icon(Icons.add_circle_outline),
-                iconSize:26.0,
+                  shape: CircleBorder(),
+                ),
+                child: IconButton(
+                  //Icons.add_circle_outline,
+                  // size: 26.0,
+                  icon: const Icon(Icons.add_circle_outline),
+                  iconSize: 26.0,
 
-                onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => LoginScreen()));
-                },
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => LoginScreen()));
+                  },
+                ),
               ),
             ),
-          ),
-          )]);
+          )
+        ]);
   }
 }

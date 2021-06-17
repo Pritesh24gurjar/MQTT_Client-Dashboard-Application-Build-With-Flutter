@@ -69,6 +69,7 @@ class _CustomSliderState extends State<CustomSlider> {
                       //inactiveColor: Colors.grey[300],
                       onChanged: (val) {
                         value = val;
+                        print(val);
                         _manager.publish(value.toInt().toString(), widget.qos,
                             widget.pub, false);
                         setState(() {
